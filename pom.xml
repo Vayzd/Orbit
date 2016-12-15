@@ -39,10 +39,10 @@
 
     <modules>
         <module>api</module>
+        <module>database</module>
         <module>native</module>
         <module>proxy</module>
         <module>spigot</module>
-        <module>storage</module>
     </modules>
 
     <dependencies>
