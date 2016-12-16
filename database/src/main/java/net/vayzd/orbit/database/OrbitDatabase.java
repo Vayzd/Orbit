@@ -151,11 +151,13 @@ final class OrbitDatabase implements Database {
                 ));
                 statement.setString(1, UUID.toString());
                 ResultSet set = statement.executeQuery();
-                if (set.next() && !set.isClosed()) {
+                if (!set.isClosed() && set.next()) {
                     DatabasePlayer player = new DatabasePlayer();
                     player.fetch(set);
                     reference.set(player);
                 }
+                set.close();
+                statement.close();
             } catch (SQLException ex) {
                 throw new RuntimeException(
                         format("Unable to get player with UUID '%s' from database!", UUID.toString()),
@@ -193,6 +195,7 @@ final class OrbitDatabase implements Database {
                 statement.setInt(3, player.getGroupId());
                 statement.setInt(4, player.getExtraId());
                 statement.executeUpdate();
+                statement.close();
             } catch (SQLException ex) {
                 throw new RuntimeException(format("Unable to insert player '%s' to database!", player.getName()), ex);
             }
