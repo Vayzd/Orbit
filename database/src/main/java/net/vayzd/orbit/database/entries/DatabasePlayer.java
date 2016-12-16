@@ -24,19 +24,31 @@
  */
 package net.vayzd.orbit.database.entries;
 
+import lombok.*;
 import net.vayzd.orbit.database.model.*;
 
 import java.sql.*;
 
+@Table(name = "players")
+@Getter
+@Setter
 public class DatabasePlayer extends DatabaseEntry {
+
+    private String UUID = null,
+            name = null;
+    private int groupId = 1,
+            extraId = 0;
 
     @Override
     public void create(QuerySet set) {
-
+        set.append("uuid", UUID).append("name", name).append("groupId", groupId).append("extraId", extraId);
     }
 
     @Override
-    public void fetch(ResultSet set) {
-
+    public void fetch(ResultSet set) throws SQLException {
+        setUUID(set.getString("uuid"));
+        setName(set.getString("name"));
+        setGroupId(set.getInt("groupId"));
+        setExtraId(set.getInt("extraId"));
     }
 }

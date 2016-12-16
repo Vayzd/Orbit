@@ -1,0 +1,8 @@
+database:
+  type: MYSQL
+  host: localhost
+  port: 27017
+  username: unknown
+  password: unknown
+  database: unknown
+pool-size: 1

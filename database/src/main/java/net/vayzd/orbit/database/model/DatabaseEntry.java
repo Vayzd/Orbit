@@ -30,5 +30,5 @@ public abstract class DatabaseEntry {
 
     public abstract void create(QuerySet set);
 
-    public abstract void fetch(ResultSet set);
+    public abstract void fetch(ResultSet set) throws SQLException;
 }

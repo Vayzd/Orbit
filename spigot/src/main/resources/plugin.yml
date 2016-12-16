@@ -1,0 +1,5 @@
+name: Orbit
+main: net.vayzd.orbit.spigot.OrbitPlugin
+author: MrRumpunsh
+version: ${version}
+description: ${description}

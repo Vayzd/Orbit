@@ -16,6 +16,13 @@
     <version>${parent.version}</version>
 
     <dependencies>
+        <!-- MariaDB Java Driver -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <scope>compile</scope>
+            <version>1.4.2</version>
+        </dependency>
         <!-- HikariCP (JDBC connection pool) -->
         <dependency>
             <groupId>com.zaxxer</groupId>

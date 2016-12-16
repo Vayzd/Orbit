@@ -24,7 +24,30 @@
  */
 package net.vayzd.orbit.database;
 
+import net.vayzd.orbit.database.entries.*;
+
+import java.sql.*;
+import java.util.*;
+
 public interface Database {
 
-    void connect(String host, int port, String username, String password, String database);
+    Connection getConnection() throws SQLException;
+
+    void connect();
+
+    void disconnect();
+
+    void getPlayer(UUID UUID, Completable<DatabasePlayer> completable);
+
+    void getPlayer(String name, Completable<DatabasePlayer> completable);
+
+    void getPlayerList(Completable<List<DatabasePlayer>> completable);
+
+    void getPlayerListByGroup(int groupId, Completable<List<DatabasePlayer>> completable);
+
+    void insertPlayer(DatabasePlayer player);
+
+    void updatePlayer(DatabasePlayer player);
+
+    void deletePlayer(DatabasePlayer player);
 }
