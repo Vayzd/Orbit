@@ -28,6 +28,9 @@ import lombok.*;
 import net.vayzd.orbit.database.model.*;
 
 import java.sql.*;
+import java.util.*;
+
+import static java.util.Arrays.asList;
 
 @Table(name = "players")
 @Getter
@@ -36,12 +39,12 @@ public class DatabasePlayer extends DatabaseEntry {
 
     private String UUID = null,
             name = null;
-    private int groupId = 1,
-            extraId = 0;
+    private int groupId = 1;
+    private List<String> permissions = new ArrayList<>();
 
     @Override
     public void create(QuerySet set) {
-        set.append("uuid", UUID).append("name", name).append("groupId", groupId).append("extraId", extraId);
+        set.append("uuid", UUID).append("name", name).append("groupId", groupId).append("permissions", permissions);
     }
 
     @Override
@@ -49,6 +52,6 @@ public class DatabasePlayer extends DatabaseEntry {
         setUUID(set.getString("uuid"));
         setName(set.getString("name"));
         setGroupId(set.getInt("groupId"));
-        setExtraId(set.getInt("extraId"));
+        setPermissions(asList(set.getString("permissions").split("/-/")));
     }
 }

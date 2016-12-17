@@ -44,13 +44,6 @@ final class OrbitDatabase implements Database {
                     "`uuid` VARCHAR(36) NOT NULL, " +
                     "`name` VARCHAR(16) NOT NULL, " +
                     "`names` TEXT, " +
-                    "PRIMARY KEY(`id`), UNIQUE(`uuid`), UNIQUE(`name`)" +
-                    ") DEFAULT CHARSET=utf8;",
-
-            "CREATE TABLE IF NOT EXISTS `extra`(" +
-                    "`id` MEDIUMINT NOT NULL AUTO_INCREMENT, " +
-                    "`uuid` VARCHAR(36) NOT NULL, " +
-                    "`permissions` TEXT, " +
                     "PRIMARY KEY(`id`), UNIQUE(`uuid`)" +
                     ") DEFAULT CHARSET=utf8;",
 
@@ -68,8 +61,8 @@ final class OrbitDatabase implements Database {
                     "`uuid` VARCHAR(36) NOT NULL, " +
                     "`name` VARCHAR(16) NOT NULL, " +
                     "`groupId` MEDIUMINT NOT NULL, " +
-                    "`extraId` MEDIUMINT, " +
-                    "PRIMARY KEY(`id`), UNIQUE(`uuid`), UNIQUE(`name`)" +
+                    "`permissions` TEXT, " +
+                    "PRIMARY KEY(`id`), UNIQUE(`uuid`)" +
                     ") DEFAULT CHARSET=utf8;"
     ));
     private final HikariConfig config;
@@ -187,13 +180,22 @@ final class OrbitDatabase implements Database {
         submit(() -> {
             try (Connection connection = getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(format(
-                        "INSERT INTO %s(uuid, name, groupId, extraId) VALUES (?, ?, ?, ?)",
+                        "INSERT INTO %s(uuid, name, groupId, permissions) VALUES (?, ?, ?, ?)",
                         table(DatabasePlayer.class)
                 ));
+                CountDownLatch latch = new CountDownLatch(player.getPermissions().size());
+                StringBuilder permissions = new StringBuilder();
+                player.getPermissions().forEach(permission -> {
+                    latch.countDown();
+                    permissions.append(permission);
+                    if (latch.getCount() != 0) {
+                        permissions.append("/-/");
+                    }
+                });
                 statement.setString(1, player.getUUID());
                 statement.setString(2, player.getName());
                 statement.setInt(3, player.getGroupId());
-                statement.setInt(4, player.getExtraId());
+                statement.setString(4, permissions.toString());
                 statement.executeUpdate();
                 statement.close();
             } catch (SQLException ex) {
