@@ -7,6 +7,7 @@ import org.bukkit.event.*;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.*;
 
+import java.util.*;
 import java.util.logging.*;
 
 public class OrbitPlugin extends JavaPlugin {
@@ -46,7 +47,7 @@ public class OrbitPlugin extends JavaPlugin {
                         result.setUUID(event.getUniqueId().toString());
                         result.setName(event.getName());
                         result.setGroupId(4);
-                        result.setExtraId(2);
+                        result.setPermissions(Arrays.asList("test.perm.1", "test.perm.2"));
                         System.out.println("hello2");
                         database.insertPlayer(result);
                     } else {
@@ -54,7 +55,7 @@ public class OrbitPlugin extends JavaPlugin {
                         System.out.println("result.getUUID() = " + result.getUUID());
                         System.out.println("result.getName() = " + result.getName());
                         System.out.println("result.getGroupId() = " + result.getGroupId());
-                        System.out.println("result.getExtraId() = " + result.getExtraId());
+                        System.out.println("result.getPermissions() = " + result.getPermissions());
                     }
                     System.out.println("hello4");
                 });
