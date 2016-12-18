@@ -39,13 +39,13 @@ public class OrbitPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new Listener() {
 
             @EventHandler
-            public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
-                database.getPlayer(event.getUniqueId(), result -> {
+            public void onPlayerJoin(PlayerJoinEvent event) {
+                database.getPlayer(event.getPlayer().getUniqueId(), result -> {
                     System.out.println("hello1");
                     if (result == null) {
                         result = new DatabasePlayer();
-                        result.setUUID(event.getUniqueId().toString());
-                        result.setName(event.getName());
+                        result.setUUID(event.getPlayer().getUniqueId().toString());
+                        result.setName(event.getPlayer().getName());
                         result.setGroupId(4);
                         result.setPermissions(Arrays.asList("test.perm.1", "test.perm.2"));
                         System.out.println("hello2");
@@ -58,6 +58,14 @@ public class OrbitPlugin extends JavaPlugin {
                         System.out.println("result.getPermissions() = " + result.getPermissions());
                     }
                     System.out.println("hello4");
+                    database.getPlayerList(playerList -> System.out.println("playerList = " + playerList.get(0).getName()));
+                    database.getPlayer(event.getPlayer().getName(), playerName -> System.out.println("playerName = " + playerName.getName()));
+                    result.setGroupId(result.getGroupId() + 1);
+                    database.updatePlayer(result);
+                    database.getPlayerListByGroup(result.getGroupId(), groupList -> {
+                        System.out.println("groupList.get(0).getName() = " + groupList.get(0).getName());
+                        System.out.println("groupList.get(0).getGroupId() = " + groupList.get(0).getGroupId());
+                    });
                 });
             }
         }, this);
