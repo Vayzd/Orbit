@@ -122,15 +122,13 @@ final class OrbitDatabase implements Database {
             } catch (SQLException ex) {
                 throw new RuntimeException("Unable to insert default database schema design!", ex);
             }
-            submit(() -> {
-                // TODO: 16.12.16 fetch and cache database groups.
-            });
+            // TODO: 16.12.16 fetch and cache database groups.
         });
     }
 
     @Override
     public void disconnect() {
-
+        source.close();
     }
 
     @Override
@@ -156,23 +154,84 @@ final class OrbitDatabase implements Database {
                         format("Unable to get player with UUID '%s' from database!", UUID.toString()),
                         ex);
             }
-            completable.complete(reference.get());
+            complete(completable, reference.get());
         });
     }
 
     @Override
     public void getPlayer(String name, Completable<DatabasePlayer> completable) {
-
+        submit(() -> {
+            AtomicReference<DatabasePlayer> reference = new AtomicReference<>(null);
+            try (Connection connection = getConnection()) {
+                PreparedStatement statement = connection.prepareStatement(format(
+                        "SELECT * FROM %s WHERE name=?",
+                        table(DatabasePlayer.class)
+                ));
+                statement.setString(1, name);
+                ResultSet set = statement.executeQuery();
+                if (!set.isClosed() && set.next()) {
+                    DatabasePlayer player = new DatabasePlayer();
+                    player.fetch(set);
+                    reference.set(player);
+                }
+                set.close();
+                statement.close();
+            } catch (SQLException ex) {
+                throw new RuntimeException(
+                        format("Unable to get player with name '%s' from database!", name),
+                        ex);
+            }
+            complete(completable, reference.get());
+        });
     }
 
     @Override
     public void getPlayerList(Completable<List<DatabasePlayer>> completable) {
-
+        submit(() -> {
+            AtomicReference<List<DatabasePlayer>> reference = new AtomicReference<>(null);
+            try (Connection connection = getConnection()) {
+                PreparedStatement statement = connection.prepareStatement(format(
+                        "SELECT * FROM %s",
+                        table(DatabasePlayer.class)
+                ));
+                ResultSet set = statement.executeQuery();
+                while (!set.isClosed() && set.next()) {
+                    DatabasePlayer player = new DatabasePlayer();
+                    player.fetch(set);
+                    reference.get().add(player);
+                }
+                set.close();
+                statement.close();
+            } catch (SQLException ex) {
+                throw new RuntimeException("Unable to get player list from database!", ex);
+            }
+            complete(completable, reference.get());
+        });
     }
 
     @Override
     public void getPlayerListByGroup(int groupId, Completable<List<DatabasePlayer>> completable) {
-
+        submit(() -> {
+            AtomicReference<List<DatabasePlayer>> reference = new AtomicReference<>(null);
+            try (Connection connection = getConnection()) {
+                PreparedStatement statement = connection.prepareStatement(format(
+                        "SELECT * FROM %s WHERE groupId=?",
+                        table(DatabasePlayer.class)
+                ));
+                statement.setInt(1, groupId);
+                ResultSet set = statement.executeQuery();
+                while (!set.isClosed() && set.next()) {
+                    DatabasePlayer player = new DatabasePlayer();
+                    player.fetch(set);
+                    reference.get().add(player);
+                }
+                set.close();
+                statement.close();
+            } catch (SQLException ex) {
+                throw new RuntimeException("Unable to get player list from database!", ex);
+            }
+            complete(completable, reference.get());
+        });
     }
 
     @Override
@@ -183,19 +242,10 @@ final class OrbitDatabase implements Database {
                         "INSERT INTO %s(uuid, name, groupId, permissions) VALUES (?, ?, ?, ?)",
                         table(DatabasePlayer.class)
                 ));
-                CountDownLatch latch = new CountDownLatch(player.getPermissions().size());
-                StringBuilder permissions = new StringBuilder();
-                player.getPermissions().forEach(permission -> {
-                    latch.countDown();
-                    permissions.append(permission);
-                    if (latch.getCount() != 0) {
-                        permissions.append("/-/");
-                    }
-                });
                 statement.setString(1, player.getUUID());
                 statement.setString(2, player.getName());
                 statement.setInt(3, player.getGroupId());
-                statement.setString(4, permissions.toString());
+                statement.setString(4, convertPermissions(player.getPermissions()));
                 statement.executeUpdate();
                 statement.close();
             } catch (SQLException ex) {
@@ -206,17 +256,62 @@ final class OrbitDatabase implements Database {
 
     @Override
     public void updatePlayer(DatabasePlayer player) {
-
+        submit(() -> {
+            try (Connection connection = getConnection()) {
+                PreparedStatement statement = connection.prepareStatement(format(
+                        "UPDATE %s SET name=?, groupId=?, permissions=? WHERE uuid=?",
+                        table(DatabasePlayer.class)
+                ));
+                statement.setString(1, player.getName());
+                statement.setInt(2, player.getGroupId());
+                statement.setString(3, convertPermissions(player.getPermissions()));
+                statement.setString(4, player.getUUID());
+                statement.executeUpdate();
+                statement.close();
+            } catch (SQLException ex) {
+                throw new RuntimeException(format("Unable to update player '%s' on database!", player.getName()), ex);
+            }
+        });
     }
 
     @Override
     public void deletePlayer(DatabasePlayer player) {
-
+        submit(() -> {
+            try (Connection connection = getConnection()) {
+                PreparedStatement statement = connection.prepareStatement(format(
+                        "DELETE FROM %s WHERE uuid=?",
+                        table(DatabasePlayer.class)
+                ));
+                statement.setString(1, player.getUUID());
+                statement.executeUpdate();
+                statement.close();
+            } catch (SQLException ex) {
+                throw new RuntimeException(format("Unable to delete player '%s' from database!", player.getName()), ex);
+            }
+        });
     }
 
     @SafeVarargs
     public final <O> String format(String message, O... objects) {
         return String.format(message, objects);
+    }
+
+    private String table(Class<? extends DatabaseEntry> from) {
+        check(from, "DatabaseEntry instance can't be null");
+        return from.getAnnotation(Table.class).name();
+    }
+
+    private String convertPermissions(List<String> permissions) {
+        CountDownLatch latch = new CountDownLatch(permissions.size());
+        StringBuilder builder = new StringBuilder();
+        permissions.forEach(permission -> {
+            latch.countDown();
+            builder.append(permission);
+            if (latch.getCount() != 0) {
+                builder.append("/-/");
+            }
+        });
+        return builder.toString();
     }
 
     private void submit(final Runnable action) {
@@ -226,11 +321,6 @@ final class OrbitDatabase implements Database {
         } else {
             queue.execute(action);
         }
-    }
-
-    private String table(Class<? extends DatabaseEntry> from) {
-        check(from, "DatabaseEntry instance can't be null");
-        return from.getAnnotation(Table.class).name();
     }
 
     private <T> void complete(final Completable<T> completable, final T result) {
