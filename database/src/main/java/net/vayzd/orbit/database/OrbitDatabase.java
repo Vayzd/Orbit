@@ -188,7 +188,7 @@ final class OrbitDatabase implements Database {
     @Override
     public void getPlayerList(Completable<List<DatabasePlayer>> completable) {
         submit(() -> {
-            AtomicReference<List<DatabasePlayer>> reference = new AtomicReference<>(null);
+            AtomicReference<List<DatabasePlayer>> reference = new AtomicReference<>(new ArrayList<>());
             try (Connection connection = getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(format(
                         "SELECT * FROM %s",
@@ -212,7 +212,7 @@ final class OrbitDatabase implements Database {
     @Override
     public void getPlayerListByGroup(int groupId, Completable<List<DatabasePlayer>> completable) {
         submit(() -> {
-            AtomicReference<List<DatabasePlayer>> reference = new AtomicReference<>(null);
+            AtomicReference<List<DatabasePlayer>> reference = new AtomicReference<>(new ArrayList<>());
             try (Connection connection = getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(format(
                         "SELECT * FROM %s WHERE groupId=?",
