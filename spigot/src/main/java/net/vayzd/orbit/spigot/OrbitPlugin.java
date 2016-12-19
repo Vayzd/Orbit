@@ -10,6 +10,8 @@ import org.bukkit.plugin.java.*;
 import java.util.*;
 import java.util.logging.*;
 
+import static java.util.Arrays.*;
+
 public class OrbitPlugin extends JavaPlugin {
 
     private Database database;
@@ -40,32 +42,20 @@ public class OrbitPlugin extends JavaPlugin {
 
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent event) {
-                database.getPlayer(event.getPlayer().getUniqueId(), result -> {
-                    System.out.println("hello1");
+                final UUID UUID = event.getPlayer().getUniqueId();
+                final String name = event.getPlayer().getName();
+                database.getPlayer(UUID, result -> {
                     if (result == null) {
                         result = new DatabasePlayer();
-                        result.setUUID(event.getPlayer().getUniqueId().toString());
-                        result.setName(event.getPlayer().getName());
-                        result.setGroupId(4);
-                        result.setPermissions(Arrays.asList("test.perm.1", "test.perm.2"));
-                        System.out.println("hello2");
+                        result.setUUID(UUID.toString());
+                        result.setName(name);
+                        result.setGroupId(0);
+                        result.setPermissions(asList("test.perm.1", "test.perm.2"));
                         database.insertPlayer(result);
-                    } else {
-                        System.out.println("hello3");
-                        System.out.println("result.getUUID() = " + result.getUUID());
-                        System.out.println("result.getName() = " + result.getName());
-                        System.out.println("result.getGroupId() = " + result.getGroupId());
-                        System.out.println("result.getPermissions() = " + result.getPermissions());
+                    } else if (!result.getName().equals(name)) {
+                        result.setName(name);
+                        database.updatePlayer(result);
                     }
-                    System.out.println("hello4");
-                    database.getPlayerList(playerList -> System.out.println("playerList = " + playerList.get(0).getName()));
-                    database.getPlayer(event.getPlayer().getName(), playerName -> System.out.println("playerName = " + playerName.getName()));
-                    result.setGroupId(result.getGroupId() + 1);
-                    database.updatePlayer(result);
-                    database.getPlayerListByGroup(result.getGroupId(), groupList -> {
-                        System.out.println("groupList.get(0).getName() = " + groupList.get(0).getName());
-                        System.out.println("groupList.get(0).getGroupId() = " + groupList.get(0).getGroupId());
-                    });
                 });
             }
         }, this);
