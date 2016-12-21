@@ -23,6 +23,13 @@
             <scope>compile</scope>
             <version>1.4.2</version>
         </dependency>
+        <!-- Required by HikariCP -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>compile</scope>
+            <version>1.7.19</version>
+        </dependency>
         <!-- HikariCP (JDBC connection pool) -->
         <dependency>
             <groupId>com.zaxxer</groupId>
