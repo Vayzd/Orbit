@@ -74,17 +74,16 @@ final class OrbitDatabase implements Database {
     private final List<Thread> threadList = new ArrayList<>();
 
     public OrbitDatabase(Logger logger, Type type, String host, int port, String username, String password, String database, int pool) throws SQLException {
+        Logger.getLogger("com.zaxxer.hikari").setLevel(Level.OFF);
         HikariConfig config = new HikariConfig();
-        {
-            config.setJdbcUrl(format("jdbc:%s://%s:%s/%s?autoReconnect=true", type.getName(), host, port, database));
-            config.setDriverClassName(type.getDriverClassName());
-            config.setUsername(username);
-            config.setPassword(password);
-            config.setMaximumPoolSize(pool * 2);
-            config.addDataSourceProperty("cachePrepStmts", "true");
-            config.addDataSourceProperty("prepStmtCacheSize", "250");
-            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        }
+        config.setJdbcUrl(format("jdbc:%s://%s:%s/%s?autoReconnect=true", type.getName(), host, port, database));
+        config.setDriverClassName(type.getDriverClassName());
+        config.setUsername(username);
+        config.setPassword(password);
+        config.setMaximumPoolSize(pool * 2);
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         if (pool == 1 && !(pool <= 0)) {
             queue = Executors.newSingleThreadExecutor(task -> {
                 Thread thread = Executors.defaultThreadFactory().newThread(task);
