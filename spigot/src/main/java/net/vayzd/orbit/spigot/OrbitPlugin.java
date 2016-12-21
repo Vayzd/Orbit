@@ -3,11 +3,13 @@ package net.vayzd.orbit.spigot;
 import net.vayzd.orbit.database.*;
 import net.vayzd.orbit.database.entries.*;
 import net.vayzd.orbit.database.model.*;
+import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 import java.util.logging.*;
 
 import static java.util.Arrays.*;
@@ -56,6 +58,15 @@ public class OrbitPlugin extends JavaPlugin {
                         result.setName(name);
                         database.updatePlayer(result);
                     }
+                });
+                AtomicReference<Long> reference = new AtomicReference<>(System.currentTimeMillis());
+                Player player = event.getPlayer();
+                database.getPlayerList(result -> {
+                    TreeSet<String> set = new TreeSet<>();
+                    result.forEach(entry -> set.add(entry.getName()));
+                    set.forEach(player::sendMessage);
+                    player.sendMessage("§aTotal of '" + set.size() + "' unique names!");
+                    player.sendMessage("§bTime taken: §e" + (System.currentTimeMillis() - reference.get()) + "ms");
                 });
             }
         }, this);
