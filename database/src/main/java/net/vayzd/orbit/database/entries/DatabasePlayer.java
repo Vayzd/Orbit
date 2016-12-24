@@ -43,11 +43,6 @@ public class DatabasePlayer extends DatabaseEntry {
     private List<String> permissions = new ArrayList<>();
 
     @Override
-    public void create(QuerySet set) {
-        set.append("uuid", UUID).append("name", name).append("groupId", groupId).append("permissions", permissions);
-    }
-
-    @Override
     public void fetch(ResultSet set) throws SQLException {
         setUUID(set.getString("uuid"));
         setName(set.getString("name"));
