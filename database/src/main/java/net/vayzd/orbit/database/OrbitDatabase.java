@@ -66,21 +66,20 @@ final class OrbitDatabase implements Database {
                     ") DEFAULT CHARSET=utf8;"
     ));
     private final HikariConfig config;
-    private final Logger logger;
     @Setter(AccessLevel.PRIVATE)
     private HikariDataSource source;
     private final AtomicLong count = new AtomicLong(0);
     private final ExecutorService queue;
     private final List<Thread> threadList = new ArrayList<>();
 
-    public OrbitDatabase(Logger logger, Type type, String host, int port, String username, String password, String database, int pool) throws SQLException {
+    public OrbitDatabase(Type type, String host, int port, String username, String password, String database, int pool) throws SQLException {
         Logger.getLogger("com.zaxxer.hikari").setLevel(Level.OFF);
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(format("jdbc:%s://%s:%s/%s?autoReconnect=true", type.getName(), host, port, database));
         config.setDriverClassName(type.getDriverClassName());
         config.setUsername(username);
         config.setPassword(password);
-        config.setMaximumPoolSize(pool * 2);
+        config.setMaximumPoolSize(pool);
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
@@ -95,14 +94,13 @@ final class OrbitDatabase implements Database {
         } else {
             queue = Executors.newFixedThreadPool(pool, task -> {
                 Thread thread = Executors.defaultThreadFactory().newThread(task);
-                thread.setName("Database Queue #" + count.incrementAndGet());
+                thread.setName("Database Thread #" + count.incrementAndGet());
                 thread.setDaemon(true);
                 threadList.add(thread);
                 return thread;
             });
         }
         this.config = config;
-        this.logger = logger;
     }
 
     @Override
