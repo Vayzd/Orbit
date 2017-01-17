@@ -24,5 +24,29 @@
  */
 package net.vayzd.orbit.database.entries;
 
-public class DatabaseGroup {
+import lombok.*;
+import net.vayzd.orbit.database.model.*;
+
+import java.sql.*;
+import java.util.*;
+
+import static java.util.Arrays.asList;
+
+@Table(name = "groups")
+@Getter
+@Setter
+public class DatabaseGroup extends DatabaseEntry {
+
+    private String name = null,
+            prefix = null;
+    private int childId = 0;
+    private List<String> permissions = new ArrayList<>();
+
+    @Override
+    public void fetch(ResultSet set) throws SQLException {
+        setName(set.getString("name"));
+        setPrefix(set.getString("prefix"));
+        setChildId(set.getInt("childId"));
+        setPermissions(asList(set.getString("permissions").split("/-/")));
+    }
 }

@@ -51,7 +51,7 @@ final class OrbitDatabase implements Database {
                     "`id` MEDIUMINT NOT NULL AUTO_INCREMENT, " +
                     "`name` VARCHAR(32) NOT NULL, " +
                     "`prefix` VARCHAR(16) NOT NULL, " +
-                    "`inherits` MEDIUMINT NOT NULL, " +
+                    "`childId` MEDIUMINT NOT NULL, " +
                     "`permissions` TEXT, " +
                     "PRIMARY KEY(`id`), UNIQUE(`name`)" +
                     ") DEFAULT CHARSET=utf8;",
