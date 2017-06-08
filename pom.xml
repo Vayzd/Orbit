@@ -36,6 +36,10 @@
         <url>https://github.com/Vayzd/Orbit/issues</url>
     </issueManagement>
 
+    <modules>
+        <module>datastore</module>
+    </modules>
+
     <dependencies>
         <!-- Fancy Project Lombok -->
         <dependency>
