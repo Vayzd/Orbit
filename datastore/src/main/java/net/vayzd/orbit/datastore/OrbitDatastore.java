@@ -389,7 +389,7 @@ public class OrbitDatastore implements Datastore {
                     "`color_char` CHAR(1) NOT NULL, " +
                     "`tab_order` SMALLINT NOT NULL, " +
                     "`permissions` TEXT NOT NULL, " +
-                    "PRIMARY KEY(`name`), UNIQUE(`tabOrder`)" +
+                    "PRIMARY KEY(`name`), UNIQUE(`tab_order`)" +
                     ") DEFAULT CHARSET=utf8;", table(DatastoreGroup.class))
     ));
 
