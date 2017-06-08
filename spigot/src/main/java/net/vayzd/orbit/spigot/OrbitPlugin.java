@@ -57,7 +57,7 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
             datastore.connect((result, error) -> {
                 if (error == null) {
                     getLogger().info("Successfully connected!");
-                    //datastore.fetchAndCacheGroups();
+                    datastore.fetchAndCacheGroups();
                 } else {
                     shutdownDueToDatastoreFailure(error);
                 }
