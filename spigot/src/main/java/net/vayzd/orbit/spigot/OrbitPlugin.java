@@ -60,12 +60,13 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
             );
             datastore.connect((result, error) -> {
                 if (error == null) {
-                    getLogger().info("Successfully connected!");
+                    getLogger().info("Successfully inserted default table schema!");
                     datastore.fetchAndCacheGroups();
                 } else {
                     shutdownDueToDatastoreFailure(error);
                 }
             });
+            getLogger().info("Successfully connected!");
         } catch (Exception error) {
             shutdownDueToDatastoreFailure(error);
         }
