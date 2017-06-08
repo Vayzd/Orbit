@@ -40,7 +40,6 @@ public class DatastoreSubject implements DatastoreEntry {
 
     private final PermissionMatcher matcher;
     private UUID uniqueId = null;
-    private String name = null;
     @Deprecated
     private String groupName = null;
     private DatastoreGroup group = null;
@@ -74,9 +73,8 @@ public class DatastoreSubject implements DatastoreEntry {
     @Override
     public void readFrom(ResultSet set) throws SQLException {
         setUniqueId(UUID.fromString(set.getString(1)));
-        setName(set.getString(2));
-        setGroupName(set.getString(3));
-        setLastSeen(set.getLong(4));
-        setPermissionSet(getSetFromString(set, 5));
+        setGroupName(set.getString(2));
+        setLastSeen(set.getLong(3));
+        setPermissionSet(getSetFromString(set, 4));
     }
 }
