@@ -42,10 +42,16 @@ public class DatastoreGroup implements DatastoreEntry {
 
     private final PermissionMatcher matcher;
     private String name = null;
+    private String displayName = null;
     private TreeSet<String> parentSet = new TreeSet<>();
     private String prefix = null,
             suffix = null;
-    private char tabColor = 'f'; // color code of ChatColor.WHITE (bukkit and bungeecord)
+    private boolean showTab = false,
+            showTag = false,
+            showChat = false;
+    // 'f' is color code of ChatColor.WHITE (bukkit and bungeecord)
+    private char colorChar = 'f';
+    // ascending ordering
     private int tabOrder = 0;
     @Setter(AccessLevel.PRIVATE)
     private TreeSet<String> permissionSet = new TreeSet<>();
@@ -75,12 +81,16 @@ public class DatastoreGroup implements DatastoreEntry {
     @Override
     public void readFrom(ResultSet set) throws SQLException {
         setName(set.getString(1));
-        setParentSet(getSetFromString(set, 2));
-        setPrefix(set.getString(3));
-        setSuffix(set.getString(4));
-        setTabColor(set.getString(5).charAt(0));
-        setTabOrder(set.getInt(6));
-        setPermissionSet(getSetFromString(set, 7));
+        setDisplayName(set.getString(2));
+        setParentSet(getSetFromString(set, 3));
+        setPrefix(set.getString(4));
+        setSuffix(set.getString(5));
+        setShowTab(set.getBoolean(6));
+        setShowTag(set.getBoolean(7));
+        setShowChat(set.getBoolean(8));
+        setColorChar(set.getString(9).charAt(0));
+        setTabOrder(set.getInt(10));
+        setPermissionSet(getSetFromString(set, 11));
     }
 
     private TreeSet<String> getSetFromString(ResultSet set, int columnIndex) throws SQLException {
