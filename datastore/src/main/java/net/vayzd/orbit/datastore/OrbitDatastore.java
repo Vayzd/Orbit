@@ -377,6 +377,7 @@ public class OrbitDatastore implements Datastore {
     }
 
     private final List<String> TABLE_SCHEMA = new LinkedList<>(asList(
+
             format("CREATE TABLE IF NOT EXISTS `%s`(" +
                     "`name` VARCHAR(16) NOT NULL, " +
                     "`display_name` VARCHAR(16) NOT NULL, " +
@@ -390,7 +391,15 @@ public class OrbitDatastore implements Datastore {
                     "`tab_order` SMALLINT NOT NULL, " +
                     "`permissions` TEXT NOT NULL, " +
                     "PRIMARY KEY(`name`), UNIQUE(`tab_order`)" +
-                    ") DEFAULT CHARSET=utf8;", table(DatastoreGroup.class))
+                    ") DEFAULT CHARSET=utf8;", table(DatastoreGroup.class)),
+
+            format("CREATE TABLE IF NOT EXISTS `%s`(" +
+                    "`uniqueId` VARCHAR(36) NOT NULL, " +
+                    "`group_name` VARCHAR(16) NOT NULL, " +
+                    "`last_seen` INT NOT NULL, " +
+                    "`permissions` TEXT NOT NULL, " +
+                    "PRIMARY KEY(`uniqueId`), INDEX(`group_name`)" +
+                    ") DEFAULT CHARSET=utf8;", table(DatastoreSubject.class))
     ));
 
     private static volatile Datastore datastore = null;
