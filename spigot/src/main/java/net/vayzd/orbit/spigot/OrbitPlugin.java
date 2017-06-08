@@ -24,6 +24,7 @@
  */
 package net.vayzd.orbit.spigot;
 
+import lombok.*;
 import net.vayzd.orbit.datastore.*;
 import net.vayzd.orbit.datastore.group.*;
 import org.bukkit.event.*;
@@ -37,6 +38,7 @@ import static java.util.Arrays.*;
 
 public class OrbitPlugin extends JavaPlugin implements Listener {
 
+    @Getter
     private Datastore datastore;
 
     @Override
