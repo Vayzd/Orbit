@@ -45,11 +45,11 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
             datastore = OrbitDatastore.createDatastore(
                     getLogger(),
                     new DatastoreCredentials(
-                            getConfig().getString("hostname"),
-                            getConfig().getInt("port"),
-                            getConfig().getString("username"),
-                            getConfig().getString("password"),
-                            getConfig().getString("defaultDatabase")
+                            getConfig().getString("database.hostname"),
+                            getConfig().getInt("database.port"),
+                            getConfig().getString("database.username"),
+                            getConfig().getString("database.password"),
+                            getConfig().getString("database.defaultDatabase")
                     ),
                     Thread.currentThread(),
                     getConfig().getInt("pool-size")
