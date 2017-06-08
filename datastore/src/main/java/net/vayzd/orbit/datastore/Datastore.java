@@ -31,7 +31,7 @@ import java.util.*;
 
 public interface Datastore extends AutoCloseable {
 
-    void connect(DataCallback<Boolean> uponCompletion);
+    void connect(DataCallback<Boolean> uponSchemaCompletion);
 
     void disconnect(DataCallback<Boolean> uponCompletion);
 

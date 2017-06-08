@@ -107,19 +107,19 @@ public class OrbitDatastore implements Datastore {
     }
 
     @Override
-    public void connect(DataCallback<Boolean> uponCompletion) {
-        checkNotNull(uponCompletion);
+    public void connect(DataCallback<Boolean> uponSchemaCompletion) {
+        checkNotNull(uponSchemaCompletion);
+        setDataSource(new HikariDataSource(config));
         submitTask(() -> {
-            setDataSource(new HikariDataSource(config));
             try (Connection connection = getConnection()) {
                 Statement statement = connection.createStatement();
                 for (String tableSchema : TABLE_SCHEMA) {
                     statement.executeUpdate(tableSchema);
                 }
                 statement.close();
-                uponCompletion.complete(true, null);
+                uponSchemaCompletion.complete(true, null);
             } catch (SQLException error) {
-                uponCompletion.complete(false, error);
+                uponSchemaCompletion.complete(false, error);
                 logger.log(Level.WARNING, "Unable to ensure default table schema!", error);
             }
         });
