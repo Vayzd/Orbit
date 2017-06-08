@@ -236,17 +236,21 @@ public class OrbitDatastore implements Datastore {
     public boolean insertGroup(DatastoreGroup group) {
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
-                    "INSERT INTO %s(name, parentSet, prefix, suffix, tabColor, tabOrder, permissionSet) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO %s(name, display_name, parents, prefix, suffix, show_tab, show_tag, show_chat, " +
+                            "color_char, tab_order, permissions) VALUES (?, ?, ?, ?, ?, ?, ?)",
                     table(DatastoreGroup.class)
             ));
             statement.setString(1, group.getName());
-            statement.setString(2, convertSetToString(group.getParentSet(), ";"));
-            statement.setString(3, group.getPrefix());
-            statement.setString(4, group.getSuffix());
-            statement.setString(5, String.valueOf(group.getTabColor()));
-            statement.setInt(6, group.getTabOrder());
-            statement.setString(7, convertSetToString(group.getPermissionSet(), ";"));
+            statement.setString(2, group.getDisplayName());
+            statement.setString(3, convertSetToString(group.getParentSet(), ";"));
+            statement.setString(4, group.getPrefix());
+            statement.setString(5, group.getSuffix());
+            statement.setBoolean(6, group.isShowTab());
+            statement.setBoolean(7, group.isShowTag());
+            statement.setBoolean(8, group.isShowChat());
+            statement.setString(9, String.valueOf(group.getColorChar()));
+            statement.setInt(10, group.getTabOrder());
+            statement.setString(11, convertSetToString(group.getPermissionSet(), ";"));
             statement.executeUpdate();
             statement.close();
             return true;
@@ -265,16 +269,21 @@ public class OrbitDatastore implements Datastore {
     public boolean updateGroup(DatastoreGroup group) {
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
-                    "UPDATE %s SET parentSet=?, prefix=?, suffix=?, color=?, order=?, permissionSet=? WHERE name=?",
+                    "UPDATE %s SET display_name=?, parents=?, prefix=?, suffix=?, show_tab=?, show_tag=?, " +
+                            "show_chat=?, color=?, order=?, permissions=? WHERE name=?",
                     table(DatastoreGroup.class)
             ));
-            statement.setString(1, convertSetToString(group.getParentSet(), ";"));
-            statement.setString(2, group.getPrefix());
-            statement.setString(3, group.getSuffix());
-            statement.setString(4, String.valueOf(group.getTabColor()));
-            statement.setInt(5, group.getTabOrder());
-            statement.setString(6, convertSetToString(group.getPermissionSet(), ";"));
-            statement.setString(7, group.getName());
+            statement.setString(1, group.getDisplayName());
+            statement.setString(2, convertSetToString(group.getParentSet(), ";"));
+            statement.setString(3, group.getPrefix());
+            statement.setString(4, group.getSuffix());
+            statement.setBoolean(5, group.isShowTab());
+            statement.setBoolean(6, group.isShowTag());
+            statement.setBoolean(7, group.isShowChat());
+            statement.setString(8, String.valueOf(group.getColorChar()));
+            statement.setInt(9, group.getTabOrder());
+            statement.setString(10, convertSetToString(group.getPermissionSet(), ";"));
+            statement.setString(11, group.getName());
             statement.executeUpdate();
             statement.close();
             return true;
@@ -369,13 +378,17 @@ public class OrbitDatastore implements Datastore {
 
     private final List<String> TABLE_SCHEMA = new LinkedList<>(asList(
             format("CREATE TABLE IF NOT EXISTS `%s`(" +
-                    "`name` VARCHAR(32) NOT NULL, " +
-                    "`parentSet` TEXT NOT NULL, " +
+                    "`name` VARCHAR(16) NOT NULL, " +
+                    "`display_name` VARCHAR(16) NOT NULL, " +
+                    "`parents` TEXT NOT NULL, " +
                     "`prefix` VARCHAR(16) NOT NULL, " +
                     "`suffix` VARCHAR(16) NOT NULL, " +
-                    "`tabColor` CHAR(1) NOT NULL, " +
-                    "`tabOrder` SMALLINT NOT NULL, " +
-                    "`permissionSet` TEXT, " +
+                    "`show_tab` BOOLEAN NOT NULL, " +
+                    "`show_tag` BOOLEAN NOT NULL, " +
+                    "`show_chat` BOOLEAN NOT NULL, " +
+                    "`color_char` CHAR(1) NOT NULL, " +
+                    "`tab_order` SMALLINT NOT NULL, " +
+                    "`permissions` TEXT NOT NULL, " +
                     "PRIMARY KEY(`name`), UNIQUE(`tabOrder`)" +
                     ") DEFAULT CHARSET=utf8;", table(DatastoreGroup.class))
     ));
@@ -383,7 +396,7 @@ public class OrbitDatastore implements Datastore {
     private static volatile Datastore datastore = null;
 
     public static Datastore createDatastore(Logger logger, DatastoreCredentials credentials, Thread primary,
-                                         int poolSize) throws Exception {
+                                            int poolSize) throws Exception {
         if (datastore == null) {
             datastore = new OrbitDatastore(logger, credentials, primary, poolSize);
         }
