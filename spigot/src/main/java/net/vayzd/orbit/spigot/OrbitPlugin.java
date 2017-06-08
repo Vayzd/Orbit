@@ -81,7 +81,7 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        datastore.getGroup("default", (found, error) -> {
+        datastore.getGroup("brutal", (found, error) -> {
             if (error == null) {
                 if (found.isPresent()) {
                     getLogger().info("Group with name 'default' is present in database!");
