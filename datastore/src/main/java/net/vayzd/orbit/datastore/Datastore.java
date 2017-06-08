@@ -31,11 +31,15 @@ import java.util.*;
 
 public interface Datastore extends AutoCloseable {
 
-    Connection getConnection() throws SQLException;
-
     void connect(DataCallback<Boolean> uponCompletion);
 
     void disconnect(DataCallback<Boolean> uponCompletion);
+
+    Connection getConnection() throws SQLException;
+
+    Connection getCaughtConnection();
+
+    void fetchAndCacheGroups();
 
     Optional<DatastoreGroup> getGroup(String name);
 
