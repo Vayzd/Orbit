@@ -163,7 +163,6 @@ public class OrbitDatastore implements Datastore {
                 while (!set.isClosed() && set.next()) {
                     DatastoreGroup group = new DatastoreGroup();
                     group.readFrom(set);
-                    group.updatePermissionSet(calculatorOf(group).computeEffectivePermissions());
                     cache.putIfAbsent(group.getName(), group);
                 }
                 set.close();
@@ -171,7 +170,18 @@ public class OrbitDatastore implements Datastore {
             } catch (SQLException error) {
                 logger.log(Level.WARNING, "Unable to fetch and locally cache groups!", error);
             }
-            logger.info(format("Successfully fetched and locally cached %s groups!", cache.size()));
+            if (cache.isEmpty()) {
+                return;
+            }
+            cache.values().forEach(group -> {
+                if (group != null) {
+                    group.updatePermissionSet(calculatorOf(group).computePermissionSet());
+                }
+            });
+            logger.info(format("Successfully fetched and locally cached %s group%s!",
+                    cache.size(),
+                    cache.size() > 1 ? "s" : ""
+            ));
         });
     }
 
@@ -191,7 +201,6 @@ public class OrbitDatastore implements Datastore {
                 if (!set.isClosed() && set.next()) {
                     DatastoreGroup group = new DatastoreGroup();
                     group.readFrom(set);
-                    group.updatePermissionSet(calculatorOf(group).computeEffectivePermissions());
                     cache.putIfAbsent(group.getName(), group);
                     reference.set(group);
                 }
@@ -199,6 +208,10 @@ public class OrbitDatastore implements Datastore {
                 statement.close();
             } catch (SQLException error) {
                 logger.log(Level.WARNING, format("Unable to get group with name '%s'!", name), error);
+            }
+            DatastoreGroup group = reference.get();
+            if (group != null) {
+                group.updatePermissionSet(calculatorOf(group).computePermissionSet());
             }
         }
         return Optional.ofNullable(reference.get());
