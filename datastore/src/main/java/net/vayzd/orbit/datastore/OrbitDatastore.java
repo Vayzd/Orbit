@@ -428,7 +428,7 @@ public class OrbitDatastore implements Datastore {
         checkNotNull(subject);
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
-                    "INSERT INTO %s(uniqueId, group_name, last_seen, permissions) VALUES (?, ?, ?, ?)",
+                    "INSERT INTO %s(uniqueId, group_name, permissions) VALUES (?, ?, ?)",
                     table(DatastoreSubject.class)
             ));
             statement.setString(1, subject.getUniqueId().toString());
@@ -436,8 +436,7 @@ public class OrbitDatastore implements Datastore {
                     ? subject.getGroupName()
                     : subject.getGroup().getName()
             );
-            statement.setLong(3, subject.getLastSeen());
-            statement.setString(4, convertSetToString(subject.getPermissionSet(), ";"));
+            statement.setString(3, convertSetToString(subject.getPermissionSet(), ";"));
             statement.executeUpdate();
             statement.close();
             return true;
@@ -459,16 +458,15 @@ public class OrbitDatastore implements Datastore {
         checkNotNull(subject);
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
-                    "UPDATE %s SET group_name=?, last_seen=?, permissions=? WHERE uniqueId=?",
+                    "UPDATE %s SET group_name=?, permissions=? WHERE uniqueId=?",
                     table(DatastoreSubject.class)
             ));
             statement.setString(1, subject.getGroup() == null
                     ? subject.getGroupName()
                     : subject.getGroup().getName()
             );
-            statement.setLong(2, subject.getLastSeen());
-            statement.setString(3, convertSetToString(subject.getPermissionSet(), ";"));
-            statement.setString(4, subject.getUniqueId().toString());
+            statement.setString(2, convertSetToString(subject.getPermissionSet(), ";"));
+            statement.setString(3, subject.getUniqueId().toString());
             statement.executeUpdate();
             statement.close();
             return true;
@@ -587,7 +585,6 @@ public class OrbitDatastore implements Datastore {
             format("CREATE TABLE IF NOT EXISTS `%s`(" +
                     "`uniqueId` VARCHAR(36) NOT NULL, " +
                     "`group_name` VARCHAR(16) NOT NULL, " +
-                    "`last_seen` BIGINT NOT NULL, " +
                     "`permissions` TEXT NOT NULL, " +
                     "PRIMARY KEY(`uniqueId`), INDEX(`group_name`)" +
                     ") DEFAULT CHARSET=utf8;", table(DatastoreSubject.class))

@@ -43,7 +43,6 @@ public class DatastoreSubject implements DatastoreEntry {
     @Deprecated
     private String groupName = null;
     private DatastoreGroup group = null;
-    private long lastSeen = 0L;
     @Setter(AccessLevel.PRIVATE)
     private TreeSet<String> permissionSet = new TreeSet<>();
 
@@ -74,7 +73,6 @@ public class DatastoreSubject implements DatastoreEntry {
     public void readFrom(ResultSet set) throws SQLException {
         setUniqueId(UUID.fromString(set.getString(1)));
         setGroupName(set.getString(2));
-        setLastSeen(set.getLong(3));
-        setPermissionSet(getSetFromString(set, 4));
+        setPermissionSet(getSetFromString(set, 3));
     }
 }
