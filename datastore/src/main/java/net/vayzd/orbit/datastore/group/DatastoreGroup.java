@@ -37,6 +37,7 @@ import static java.util.Collections.*;
 @DatastoreTable(name = "groups")
 @Getter
 @Setter
+@ToString
 public class DatastoreGroup implements DatastoreEntry {
 
     private final PermissionMatcher matcher;
