@@ -43,21 +43,22 @@ public class PermissionCalculator {
         return new PermissionCalculator(group, datastore);
     }
 
-    public ImmutableSet<String> computeEffectivePermissions() {
-        List<String> permissions = new LinkedList<>();
+    public ImmutableSet<String> computePermissionSet() {
+        TreeSet<String> permissionSet = new TreeSet<>();
         for (String ancestor : calculateGroupTree()) {
             for (String permission : getGroupFor(ancestor).getPermissionSet()) {
-                if (permissions.contains(permission)) {
+                if (permissionSet.contains(permission)) {
                     continue;
                 }
-                permissions.add(permission);
+                permissionSet.add(permission);
             }
         }
-        return squash(permissions);
+        return squash(permissionSet);
     }
 
     private ImmutableSet<String> calculateGroupTree() {
         List<String> tree = new ArrayList<>();
+        tree.add(group.getName());
         for (String next : group.getParentSet()) {
             if (next.equals(group.getName())) {
                 continue;
@@ -70,7 +71,7 @@ public class PermissionCalculator {
     }
 
     private ImmutableSet<String> calculateBackwardGroupTree(String group) {
-        List<String> tree = new ArrayList<>();
+        TreeSet<String> tree = new TreeSet<>();
         tree.add(group);
         for (String next : getGroupFor(group).getParentSet()) {
             try {
