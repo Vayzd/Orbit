@@ -97,7 +97,6 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
                 DatastoreSubject subject = new DatastoreSubject();
                 subject.setUniqueId(event.getUniqueId());
                 subject.setGroupName("default");
-                subject.setLastSeen(System.currentTimeMillis());
                 subject.updatePermissionSet(new TreeSet<>(asList("test.1", "test.2")));
                 return subject;
             }), (success, error) -> {
