@@ -38,7 +38,6 @@ public interface DataCallback<T> {
      *
      * @param result the result of the computation
      * @param error  the error(s) that occurred, if any
-     * @param <E>    the type of error
      */
-    <E extends Throwable> void complete(T result, E error);
+    void complete(T result, Throwable error);
 }
