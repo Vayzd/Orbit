@@ -33,6 +33,8 @@ import org.bukkit.plugin.java.*;
 import java.util.*;
 import java.util.logging.*;
 
+import static java.util.Arrays.*;
+
 public class OrbitPlugin extends JavaPlugin implements Listener {
 
     private Datastore datastore;
@@ -70,18 +72,49 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
-        Optional<DatastoreGroup> found = datastore.getGroup("default");
+        /*Optional<DatastoreGroup> found = datastore.getGroup("default");
         if (found.isPresent()) {
             getLogger().info("Group with name 'default' is present in database!");
             getLogger().info(found.get().toString());
         } else {
             getLogger().warning("Unable to find group with name 'default'!");
+        }*/
+        Optional<DatastoreSubject> result = datastore.getSubject(event.getUniqueId());
+        if (result.isPresent()) {
+            getLogger().info("");
+            getLogger().info("Found subject by UUID '" + event.getUniqueId().toString() + "'");
+            getLogger().info("");
+            getLogger().info(result.get().toString());
+            getLogger().info("");
+        } else {
+            getLogger().warning("");
+            getLogger().warning("Unable to find subject by UUID '" + event.getUniqueId().toString() + "'");
+            getLogger().warning("Inserting it...");
+            getLogger().warning("");
+            datastore.insertSubject(result.orElseGet(() -> {
+                DatastoreSubject subject = new DatastoreSubject();
+                subject.setUniqueId(event.getUniqueId());
+                subject.setGroupName("default");
+                subject.setLastSeen(System.currentTimeMillis());
+                subject.updatePermissionSet(new TreeSet<>(asList("test.1", "test.2")));
+                return subject;
+            }), (success, error) -> {
+                if (error == null && success) {
+                    getLogger().info("");
+                    getLogger().info("Successfully inserted!");
+                    getLogger().info("");
+                } else {
+                    getLogger().warning("");
+                    getLogger().log(Level.WARNING, "Unable to insert subject!", error);
+                    getLogger().warning("");
+                }
+            });
         }
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        datastore.getGroup("brutal", (found, error) -> {
+        /*datastore.getGroup("brutal", (found, error) -> {
             if (error == null) {
                 if (found.isPresent()) {
                     getLogger().info("Group with name 'default' is present in database!");
@@ -91,6 +124,21 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
                 }
             } else {
                 getLogger().warning("Unable to find group with name 'default'!");
+            }
+        });*/
+        datastore.getSubject(event.getPlayer().getUniqueId(), (result, error) -> {
+            if (error == null) {
+                if (result.isPresent()) {
+                    getLogger().info("");
+                    getLogger().info("Found subject by UUID '" + event.getPlayer().getUniqueId().toString() + "'");
+                    getLogger().info("");
+                    getLogger().info(result.get().toString());
+                    getLogger().info("");
+                } else {
+                    getLogger().warning("Unable to find subject!");
+                }
+            } else {
+                getLogger().warning("Unable to find subject!");
             }
         });
     }
