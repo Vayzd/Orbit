@@ -69,6 +69,10 @@ public interface Datastore extends AutoCloseable {
 
     void hasSubject(UUID uniqueId, DataCallback<Boolean> callback);
 
+    List<DatastoreSubject> getSubjectListByGroup(String name);
+
+    void getSubjectListByGroup(String name, DataCallback<List<DatastoreSubject>> callback);
+
     boolean insertSubject(DatastoreSubject subject);
 
     void insertSubject(DatastoreSubject subject, DataCallback<Boolean> uponCompletion);
