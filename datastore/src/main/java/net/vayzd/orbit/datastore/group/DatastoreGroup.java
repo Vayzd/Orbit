@@ -24,15 +24,15 @@
  */
 package net.vayzd.orbit.datastore.group;
 
-import com.google.common.base.*;
 import lombok.*;
 import net.vayzd.orbit.datastore.*;
 
 import java.sql.*;
 import java.util.*;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
+import static com.google.common.base.Preconditions.*;
+import static java.util.Arrays.*;
+import static java.util.Collections.*;
 
 @DatastoreTable(name = "groups")
 @Getter
@@ -56,41 +56,42 @@ public class DatastoreGroup implements DatastoreEntry {
 
     public DatastoreGroup(@NonNull String name) {
         this();
-        Preconditions.checkNotNull(name, "Name can't be null");
+        checkNotNull(name, "Name can't be null");
         this.name = name;
     }
 
     public void updatePermissionSet(@NonNull Set<String> updatedSet) {
-        Preconditions.checkNotNull(updatedSet, "Updated permission set can't be null");
+        checkNotNull(updatedSet, "Updated permission set can't be null");
         permissionSet.clear();
         permissionSet.addAll(updatedSet);
         matcher.updatePermissionSet(updatedSet);
     }
 
     public boolean hasPermission(@NonNull String permission) {
-        Preconditions.checkNotNull(permission, "Permission to check for can't be null");
+        checkNotNull(permission, "Permission to check for can't be null");
         return matcher.hasPermission(permission);
     }
 
     @Override
     public void readFrom(ResultSet set) throws SQLException {
         setName(set.getString(1));
-        setParentSet(getSetFromArray(set, 2));
+        setParentSet(getSetFromString(set, 2));
         setPrefix(set.getString(3));
         setSuffix(set.getString(4));
         setTabColor(set.getString(5));
         setTabOrder(set.getInt(6));
-        setPermissionSet(getSetFromArray(set, 7));
+        setPermissionSet(getSetFromString(set, 7));
     }
 
-    private TreeSet<String> getSetFromArray(ResultSet set, int columnIndex) throws SQLException {
-        Array array = set.getArray(columnIndex);
+    private TreeSet<String> getSetFromString(ResultSet set, int columnIndex) throws SQLException {
+        String value = set.getString(columnIndex);
         try {
-            return new TreeSet<>(asList((String[]) array.getArray()));
-        } catch (ClassCastException ignored) {
-            return new TreeSet<>(singletonList("0"));
-        } finally {
-            array.free();
+            checkNotNull(value);
+            checkArgument(!value.isEmpty());
+            checkArgument(value.contains(";"));
+            return new TreeSet<>(asList(value.split(";")));
+        } catch (NullPointerException | IllegalArgumentException ignored) {
+            return new TreeSet<>(singletonList("default"));
         }
     }
 }
