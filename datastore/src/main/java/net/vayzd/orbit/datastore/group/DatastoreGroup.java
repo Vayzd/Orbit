@@ -60,7 +60,7 @@ public class DatastoreGroup implements DatastoreEntry {
         this.name = name;
     }
 
-    public void updatePermissionSet(@NonNull TreeSet<String> updatedSet) {
+    public void updatePermissionSet(@NonNull Set<String> updatedSet) {
         Preconditions.checkNotNull(updatedSet, "Updated permission set can't be null");
         permissionSet.clear();
         permissionSet.addAll(updatedSet);

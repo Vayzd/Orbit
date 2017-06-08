@@ -48,7 +48,7 @@ final class PermissionMatcher {
         }
     }
 
-    void updatePermissionSet(TreeSet<String> updatedSet) {
+    void updatePermissionSet(Set<String> updatedSet) {
         permissionSet.clear();
         permissionSet.addAll(updatedSet);
         deliver();
