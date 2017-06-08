@@ -238,21 +238,22 @@ public class OrbitDatastore implements Datastore {
         checkNotNull(group);
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
-                    "INSERT INTO %s(name, display_name, parents, prefix, suffix, show_tab, show_tag, show_chat, " +
-                            "color_char, tab_order, permissions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO %s(name, parents, default_group, display_name, prefix, suffix, show_tab, show_tag, show_chat, " +
+                            "color_char, tab_order, permissions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     table(DatastoreGroup.class)
             ));
             statement.setString(1, group.getName());
-            statement.setString(2, group.getDisplayName());
-            statement.setString(3, convertSetToString(group.getParentSet(), ";"));
-            statement.setString(4, group.getPrefix());
-            statement.setString(5, group.getSuffix());
-            statement.setBoolean(6, group.isShowTab());
-            statement.setBoolean(7, group.isShowTag());
-            statement.setBoolean(8, group.isShowChat());
-            statement.setString(9, String.valueOf(group.getColorChar()));
-            statement.setInt(10, group.getTabOrder());
-            statement.setString(11, convertSetToString(group.getPermissionSet(), ";"));
+            statement.setString(2, convertSetToString(group.getParentSet(), ";"));
+            statement.setBoolean(3, group.isDefaultGroup());
+            statement.setString(4, group.getDisplayName());
+            statement.setString(5, group.getPrefix());
+            statement.setString(6, group.getSuffix());
+            statement.setBoolean(7, group.isShowTab());
+            statement.setBoolean(8, group.isShowTag());
+            statement.setBoolean(9, group.isShowChat());
+            statement.setString(10, String.valueOf(group.getColorChar()));
+            statement.setInt(11, group.getTabOrder());
+            statement.setString(12, convertSetToString(group.getPermissionSet(), ";"));
             statement.executeUpdate();
             statement.close();
             return true;
@@ -272,21 +273,22 @@ public class OrbitDatastore implements Datastore {
         checkNotNull(group);
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
-                    "UPDATE %s SET display_name=?, parents=?, prefix=?, suffix=?, show_tab=?, show_tag=?, " +
+                    "UPDATE %s SET parents=?, default_group=?, display_name=?, prefix=?, suffix=?, show_tab=?, show_tag=?, " +
                             "show_chat=?, color=?, order=?, permissions=? WHERE name=?",
                     table(DatastoreGroup.class)
             ));
-            statement.setString(1, group.getDisplayName());
-            statement.setString(2, convertSetToString(group.getParentSet(), ";"));
-            statement.setString(3, group.getPrefix());
-            statement.setString(4, group.getSuffix());
-            statement.setBoolean(5, group.isShowTab());
-            statement.setBoolean(6, group.isShowTag());
-            statement.setBoolean(7, group.isShowChat());
-            statement.setString(8, String.valueOf(group.getColorChar()));
-            statement.setInt(9, group.getTabOrder());
-            statement.setString(10, convertSetToString(group.getPermissionSet(), ";"));
-            statement.setString(11, group.getName());
+            statement.setString(1, convertSetToString(group.getParentSet(), ";"));
+            statement.setBoolean(2, group.isDefaultGroup());
+            statement.setString(3, group.getDisplayName());
+            statement.setString(4, group.getPrefix());
+            statement.setString(5, group.getSuffix());
+            statement.setBoolean(6, group.isShowTab());
+            statement.setBoolean(7, group.isShowTag());
+            statement.setBoolean(8, group.isShowChat());
+            statement.setString(9, String.valueOf(group.getColorChar()));
+            statement.setInt(10, group.getTabOrder());
+            statement.setString(11, convertSetToString(group.getPermissionSet(), ";"));
+            statement.setString(12, group.getName());
             statement.executeUpdate();
             statement.close();
             return true;
@@ -551,8 +553,9 @@ public class OrbitDatastore implements Datastore {
 
             format("CREATE TABLE IF NOT EXISTS `%s`(" +
                     "`name` VARCHAR(16) NOT NULL, " +
-                    "`display_name` VARCHAR(16) NOT NULL, " +
                     "`parents` TEXT NOT NULL, " +
+                    "`default_group` BOOLEAN NOT NULL, " +
+                    "`display_name` VARCHAR(16) NOT NULL, " +
                     "`prefix` VARCHAR(16) NOT NULL, " +
                     "`suffix` VARCHAR(16) NOT NULL, " +
                     "`show_tab` BOOLEAN NOT NULL, " +

@@ -40,8 +40,9 @@ public class DatastoreGroup implements DatastoreEntry {
 
     private final PermissionMatcher matcher;
     private String name = null;
-    private String displayName = null;
     private TreeSet<String> parentSet = new TreeSet<>();
+    private boolean defaultGroup = false;
+    private String displayName = null;
     private String prefix = null,
             suffix = null;
     private boolean showTab = false,
@@ -79,15 +80,16 @@ public class DatastoreGroup implements DatastoreEntry {
     @Override
     public void readFrom(ResultSet set) throws SQLException {
         setName(set.getString(1));
-        setDisplayName(set.getString(2));
-        setParentSet(getSetFromString(set, 3));
-        setPrefix(set.getString(4));
-        setSuffix(set.getString(5));
-        setShowTab(set.getBoolean(6));
-        setShowTag(set.getBoolean(7));
-        setShowChat(set.getBoolean(8));
-        setColorChar(set.getString(9).charAt(0));
-        setTabOrder(set.getInt(10));
-        setPermissionSet(getSetFromString(set, 11));
+        setParentSet(getSetFromString(set, 2));
+        setDefaultGroup(set.getBoolean(3));
+        setDisplayName(set.getString(4));
+        setPrefix(set.getString(5));
+        setSuffix(set.getString(6));
+        setShowTab(set.getBoolean(7));
+        setShowTag(set.getBoolean(8));
+        setShowChat(set.getBoolean(9));
+        setColorChar(set.getString(10).charAt(0));
+        setTabOrder(set.getInt(11));
+        setPermissionSet(getSetFromString(set, 12));
     }
 }
