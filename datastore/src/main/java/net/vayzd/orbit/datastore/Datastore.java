@@ -49,6 +49,10 @@ public interface Datastore extends AutoCloseable {
 
     void hasGroup(String name, DataCallback<Boolean> callback);
 
+    Optional<DatastoreGroup> getDefaultGroup();
+
+    boolean hasDefaultGroup();
+
     boolean insertGroup(DatastoreGroup group);
 
     void insertGroup(DatastoreGroup group, DataCallback<Boolean> uponCompletion);

@@ -48,6 +48,7 @@ public class OrbitDatastore implements Datastore {
     private final Set<Thread> threadSet = new HashSet<>();
     private final AtomicLong threadCount = new AtomicLong(0);
     private final AtomicReference<Thread> primaryThread = new AtomicReference<>();
+    private final AtomicReference<DatastoreGroup> defaultGroup = new AtomicReference<>(null);
     private final ConcurrentMap<String, DatastoreGroup> cache = new ConcurrentHashMap<>();
 
     private OrbitDatastore(Logger logger, DatastoreCredentials credentials, Thread primary,
@@ -178,6 +179,12 @@ public class OrbitDatastore implements Datastore {
                     group.updatePermissionSet(calculatorOf(group).computePermissionSet());
                 }
             });
+            for (DatastoreGroup group : cache.values()) {
+                if (group.isDefaultGroup()) {
+                    defaultGroup.set(group);
+                    break;
+                }
+            }
             logger.info(format("Successfully fetched and locally cached %s group%s!",
                     cache.size(),
                     cache.size() > 1 ? "s" : ""
@@ -231,6 +238,16 @@ public class OrbitDatastore implements Datastore {
     @Override
     public void hasGroup(String name, DataCallback<Boolean> callback) {
         fulfill(callback, hasGroup(name));
+    }
+
+    @Override
+    public Optional<DatastoreGroup> getDefaultGroup() {
+        return Optional.ofNullable(defaultGroup.get());
+    }
+
+    @Override
+    public boolean hasDefaultGroup() {
+        return getDefaultGroup().isPresent();
     }
 
     @Override
