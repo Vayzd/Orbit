@@ -43,10 +43,9 @@ public class DatastoreGroup implements DatastoreEntry {
     private String name = null;
     private TreeSet<String> parentSet = new TreeSet<>();
     private String prefix = null,
-            suffix = null,
-            tabColor = null;
+            suffix = null;
+    private char tabColor = 'f'; // color code of ChatColor.WHITE (bukkit and bungeecord)
     private int tabOrder = 0;
-    @Getter(AccessLevel.PACKAGE)
     @Setter(AccessLevel.PRIVATE)
     private TreeSet<String> permissionSet = new TreeSet<>();
 
@@ -78,7 +77,7 @@ public class DatastoreGroup implements DatastoreEntry {
         setParentSet(getSetFromString(set, 2));
         setPrefix(set.getString(3));
         setSuffix(set.getString(4));
-        setTabColor(set.getString(5));
+        setTabColor(set.getString(5).charAt(0));
         setTabOrder(set.getInt(6));
         setPermissionSet(getSetFromString(set, 7));
     }
