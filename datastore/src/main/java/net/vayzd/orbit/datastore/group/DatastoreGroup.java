@@ -31,8 +31,6 @@ import java.sql.*;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.*;
-import static java.util.Arrays.*;
-import static java.util.Collections.*;
 
 @DatastoreTable(name = "groups")
 @Getter
@@ -91,17 +89,5 @@ public class DatastoreGroup implements DatastoreEntry {
         setColorChar(set.getString(9).charAt(0));
         setTabOrder(set.getInt(10));
         setPermissionSet(getSetFromString(set, 11));
-    }
-
-    private TreeSet<String> getSetFromString(ResultSet set, int columnIndex) throws SQLException {
-        String value = set.getString(columnIndex);
-        try {
-            checkNotNull(value);
-            checkArgument(!value.isEmpty());
-            checkArgument(value.contains(";"));
-            return new TreeSet<>(asList(value.split(";")));
-        } catch (NullPointerException | IllegalArgumentException ignored) {
-            return new TreeSet<>(singletonList("default"));
-        }
     }
 }
