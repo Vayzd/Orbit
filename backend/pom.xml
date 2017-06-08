@@ -11,11 +11,18 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>database</artifactId>
+    <artifactId>orbit-backend</artifactId>
     <packaging>jar</packaging>
     <version>${parent.version}</version>
 
     <dependencies>
+        <!-- Google Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>compile</scope>
+            <version>18.0</version>
+        </dependency>
         <!-- MariaDB Java Driver -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>

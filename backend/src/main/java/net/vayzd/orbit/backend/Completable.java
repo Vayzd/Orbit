@@ -22,11 +22,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.vayzd.orbit.database.model;
+package net.vayzd.orbit.backend;
 
-import java.sql.*;
+/**
+ * Represents a method which may be called once a result has been computed
+ * asynchronously.
+ *
+ * @param <T> the type of result
+ */
+@FunctionalInterface
+public interface Completable<T> {
 
-public abstract class DatabaseEntry {
-
-    public abstract void fetch(ResultSet set) throws SQLException;
+    /**
+     * Called when the computation is done.
+     *
+     * @param result the result of the computation
+     */
+    void complete(T result);
 }

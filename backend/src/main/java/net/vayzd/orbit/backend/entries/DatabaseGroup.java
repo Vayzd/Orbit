@@ -22,31 +22,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.vayzd.orbit.database.entries;
+package net.vayzd.orbit.backend.entries;
 
 import lombok.*;
-import net.vayzd.orbit.database.model.*;
+import net.vayzd.orbit.backend.model.*;
 
 import java.sql.*;
 import java.util.*;
 
-import static java.util.Arrays.asList;
+import static java.util.Arrays.*;
 
 @Table(name = "groups")
 @Getter
 @Setter
 public class DatabaseGroup extends DatabaseEntry {
 
-    private String name = null,
-            prefix = null;
-    private int childId = 0;
-    private List<String> permissions = new ArrayList<>();
+    private final PermissionMatcher matcher;
+    private String name = null;
+    private String prefix = null,
+            suffix = null,
+            color = null;
+    private int order = 0;
+    private List<String> parents = new LinkedList<>();
+    private List<String> permissions = new LinkedList<>();
+
+    public DatabaseGroup() {
+        this.matcher = new PermissionMatcher(permissions, true);
+    }
+
+    public DatabaseGroup(String name) {
+        this();
+        this.name = name;
+    }
+
+    public void setPermissions(List<String> update) {
+        permissions = update;
+        matcher.setPermissions(update);
+    }
+
+    boolean hasPermission(String permission) {
+        return matcher.hasPermission(permission);
+    }
 
     @Override
     public void fetch(ResultSet set) throws SQLException {
         setName(set.getString("name"));
+        setParents(new LinkedList<>(asList(set.getString("parents").split(";"))));
         setPrefix(set.getString("prefix"));
-        setChildId(set.getInt("childId"));
-        setPermissions(asList(set.getString("permissions").split("/-/")));
+        setSuffix(set.getString("suffix"));
+        setColor(set.getString("color"));
+        setOrder(set.getInt("order"));
+        setPermissions(new LinkedList<>(asList(set.getString("permissions").split(";"))));
     }
 }

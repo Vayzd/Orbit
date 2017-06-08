@@ -15,7 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <command.option.color>false</command.option.color>
-        <netty.version>4.1.6.Final</netty.version>
+        <netty.version>4.1.9.Final</netty.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
@@ -39,8 +39,8 @@
 
     <modules>
         <module>api</module>
-        <module>database</module>
-        <module>native</module>
+        <module>backend</module>
+        <module>protocol</module>
         <module>proxy</module>
         <module>spigot</module>
     </modules>

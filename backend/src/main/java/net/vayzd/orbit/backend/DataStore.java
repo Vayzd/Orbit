@@ -22,14 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.vayzd.orbit.database;
+package net.vayzd.orbit.backend;
 
-import net.vayzd.orbit.database.entries.*;
+import net.vayzd.orbit.backend.entries.*;
 
 import java.sql.*;
 import java.util.*;
 
-public interface Database {
+public interface DataStore {
 
     Connection getConnection() throws SQLException;
 
@@ -37,13 +37,45 @@ public interface Database {
 
     void disconnect();
 
-    void getPlayer(UUID UUID, Completable<DatabasePlayer> completable);
+    void fetchAndCacheGroups();
 
-    void getPlayer(String name, Completable<DatabasePlayer> completable);
+    Optional<DatabaseGroup> getGroup(String name);
+
+    void getGroup(String name, Completable<Optional<DatabaseGroup>> completable);
+
+    boolean hasGroup(String name);
+
+    void hasGroup(String name, Completable<Boolean> completable);
+
+    void insertGroup(DatabaseGroup name);
+
+    void updateGroup(DatabaseGroup name);
+
+    void deleteGroup(DatabaseGroup name);
+
+    Optional<DatabasePlayer> getPlayer(UUID UUID);
+
+    void getPlayer(UUID UUID, Completable<Optional<DatabasePlayer>> completable);
+
+    Optional<DatabasePlayer> getPlayer(String name);
+
+    void getPlayer(String name, Completable<Optional<DatabasePlayer>> completable);
+
+    boolean hasPlayer(UUID UUID);
+
+    void hasPlayer(UUID UUID, Completable<Boolean> completable);
+
+    boolean hasPlayer(String name);
+
+    void hasPlayer(String name, Completable<Boolean> completable);
+
+    List<DatabasePlayer> getPlayerList();
 
     void getPlayerList(Completable<List<DatabasePlayer>> completable);
 
-    void getPlayerListByGroup(int groupId, Completable<List<DatabasePlayer>> completable);
+    List<DatabasePlayer> getPlayerListByGroup(String name);
+
+    void getPlayerListByGroup(String name, Completable<List<DatabasePlayer>> completable);
 
     void insertPlayer(DatabasePlayer player);
 

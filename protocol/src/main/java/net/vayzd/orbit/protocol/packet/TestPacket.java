@@ -22,21 +22,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.vayzd.orbit.database;
+package net.vayzd.orbit.protocol.packet;
 
-/**
- * Represents a method which may be called once a result has been computed
- * asynchronously.
- *
- * @param <T> the type of result
- */
-@FunctionalInterface
-public interface Completable<T> {
+import io.netty.buffer.*;
+import lombok.*;
+import net.vayzd.orbit.protocol.*;
 
-    /**
-     * Called when the computation is done.
-     *
-     * @param result the result of the computation
-     */
-    void complete(T result);
+import java.io.*;
+
+@EqualsAndHashCode(callSuper = false)
+@Data
+public class TestPacket extends OrbitPacket {
+
+    @Override
+    public void read(ByteBufInputStream stream) throws IOException {
+
+    }
+
+    @Override
+    public void write(ByteBufOutputStream stream) throws IOException {
+
+    }
 }

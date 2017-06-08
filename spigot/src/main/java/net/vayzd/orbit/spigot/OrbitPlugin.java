@@ -24,9 +24,9 @@
  */
 package net.vayzd.orbit.spigot;
 
-import net.vayzd.orbit.database.*;
-import net.vayzd.orbit.database.entries.*;
-import net.vayzd.orbit.database.model.*;
+import net.vayzd.orbit.backend.*;
+import net.vayzd.orbit.backend.entries.*;
+import net.vayzd.orbit.backend.model.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.player.*;
@@ -40,14 +40,15 @@ import static java.util.Arrays.*;
 
 public class OrbitPlugin extends JavaPlugin {
 
-    private Database database;
+    private DataStore dataStore;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         getLogger().info("Connecting to database...");
         try {
-            OrbitAdapter adapter = new OrbitAdapter(Type.valueOf(getConfig().getString("database.type")),
+            dataStore = OrbitDataStore.newDataStore(getLogger(),
+                    Type.valueOf(getConfig().getString("database.type")),
                     getConfig().getString("database.host"),
                     getConfig().getInt("database.port"),
                     getConfig().getString("database.username"),
@@ -55,36 +56,41 @@ public class OrbitPlugin extends JavaPlugin {
                     getConfig().getString("database.database"),
                     getConfig().getInt("pool-size")
             );
-            database = adapter.getDatabase();
-            database.connect();
+            dataStore.connect();
             getLogger().info("Successfully connected!");
         } catch (Exception ex) {
             getLogger().log(Level.WARNING, "Failed to connect to database!", ex);
             getLogger().info("Shutting down...");
             getServer().shutdown();
         }
+        dataStore.fetchAndCacheGroups();
         getServer().getPluginManager().registerEvents(new Listener() {
 
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent event) {
                 final UUID UUID = event.getPlayer().getUniqueId();
                 final String name = event.getPlayer().getName();
-                database.getPlayer(UUID, result -> {
-                    if (result == null) {
-                        result = new DatabasePlayer();
-                        result.setUUID(UUID.toString());
+                dataStore.getPlayer(UUID, found -> {
+                    DatabasePlayer result = found.orElseGet(() -> {
+                        DatabasePlayer player = new DatabasePlayer();
+                        player.setUUID(UUID.toString());
+                        player.setName(name);
+                        player.setGroup("default");
+                        player.setPermissions(asList("test.perm.1", "test.perm.2"));
+                        dataStore.insertPlayer(player);
+                        return player;
+                    });
+                    if (!name.equals(result.getName())) {
                         result.setName(name);
-                        result.setGroupId(0);
-                        result.setPermissions(asList("test.perm.1", "test.perm.2"));
-                        database.insertPlayer(result);
-                    } else if (!result.getName().equals(name)) {
-                        result.setName(name);
-                        database.updatePlayer(result);
+                        dataStore.updatePlayer(result);
                     }
+                    System.out.println("result.getCombinedPermissions() = " + result.getCombinedPermissions());
+                    System.out.println("result.hasPermission(\"test1\") = " + result.hasPermission("test1"));
+                    System.out.println("result.hasPermission(\"test8\") = " + result.hasPermission("test8"));
                 });
                 AtomicReference<Long> reference = new AtomicReference<>(System.currentTimeMillis());
                 Player player = event.getPlayer();
-                database.getPlayerList(result -> {
+                dataStore.getPlayerList(result -> {
                     TreeSet<String> set = new TreeSet<>();
                     result.forEach(entry -> set.add(entry.getName()));
                     set.forEach(player::sendMessage);

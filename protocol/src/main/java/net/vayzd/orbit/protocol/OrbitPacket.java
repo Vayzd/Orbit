@@ -22,31 +22,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.vayzd.orbit.database.entries;
+package net.vayzd.orbit.protocol;
 
-import lombok.*;
-import net.vayzd.orbit.database.model.*;
+import io.netty.buffer.*;
 
-import java.sql.*;
-import java.util.*;
+import java.io.*;
 
-import static java.util.Arrays.asList;
+public abstract class OrbitPacket {
 
-@Table(name = "players")
-@Getter
-@Setter
-public class DatabasePlayer extends DatabaseEntry {
+    public void read(ByteBufInputStream stream) throws IOException {
+        throw new UnsupportedOperationException("Packet must implement read method");
+    }
 
-    private String UUID = null,
-            name = null;
-    private int groupId = 1;
-    private List<String> permissions = new ArrayList<>();
+    public void write(ByteBufOutputStream stream) throws IOException {
+        throw new UnsupportedOperationException("Packet must implement write method");
+    }
 
     @Override
-    public void fetch(ResultSet set) throws SQLException {
-        setUUID(set.getString("uuid"));
-        setName(set.getString("name"));
-        setGroupId(set.getInt("groupId"));
-        setPermissions(asList(set.getString("permissions").split("/-/")));
-    }
+    public abstract boolean equals(Object obj);
+
+    @Override
+    public abstract int hashCode();
+
+    @Override
+    public abstract String toString();
 }

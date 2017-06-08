@@ -11,7 +11,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>spigot</artifactId>
+    <artifactId>orbit-spigot</artifactId>
     <packaging>jar</packaging>
     <version>${parent.version}</version>
 
@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>net.vayzd</groupId>
-            <artifactId>database</artifactId>
+            <artifactId>backend</artifactId>
             <scope>compile</scope>
             <version>0.1-SNAPSHOT</version>
         </dependency>

@@ -22,24 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.vayzd.orbit.database;
+package net.vayzd.orbit.backend.model;
 
 import lombok.*;
-import net.vayzd.orbit.database.model.*;
 
-import java.sql.*;
-
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 @Getter
-public class OrbitAdapter {
+public enum Type {
 
-    private final Database database;
+    MARIADB("mariadb", "org.mariadb.jdbc.Driver"),
+    MYSQL("mysql", "com.mysql.jdbc.Driver");
 
-    public OrbitAdapter(Type type, String host, int port, String username, String password, String database, int pool) {
-        try {
-            this.database = new OrbitDatabase(type, host, port, username, password, database, pool);
-        } catch (SQLException ex) {
-            throw new RuntimeException("Unable to establish database connectivity!", ex);
-        }
-    }
+    private final String name;
+    private final String driverClassName;
 }

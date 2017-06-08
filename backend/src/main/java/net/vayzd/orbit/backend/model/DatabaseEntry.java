@@ -22,17 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package net.vayzd.orbit.database.model;
+package net.vayzd.orbit.backend.model;
 
-import lombok.*;
+import java.sql.*;
 
-@RequiredArgsConstructor
-@Getter
-public enum Type {
+public abstract class DatabaseEntry {
 
-    MARIADB("mariadb", "org.mariadb.jdbc.Driver"),
-    MYSQL("mysql", "com.mysql.jdbc.Driver");
-
-    private final String name;
-    private final String driverClassName;
+    public abstract void fetch(ResultSet set) throws SQLException;
 }
