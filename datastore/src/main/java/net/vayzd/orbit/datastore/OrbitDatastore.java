@@ -567,7 +567,7 @@ public class OrbitDatastore implements Datastore {
             format("CREATE TABLE IF NOT EXISTS `%s`(" +
                     "`uniqueId` VARCHAR(36) NOT NULL, " +
                     "`group_name` VARCHAR(16) NOT NULL, " +
-                    "`last_seen` INT NOT NULL, " +
+                    "`last_seen` BIGINT NOT NULL, " +
                     "`permissions` TEXT NOT NULL, " +
                     "PRIMARY KEY(`uniqueId`), INDEX(`group_name`)" +
                     ") DEFAULT CHARSET=utf8;", table(DatastoreSubject.class))
