@@ -60,4 +60,24 @@ public interface Datastore extends AutoCloseable {
     boolean deleteGroup(DatastoreGroup group);
 
     void deleteGroup(DatastoreGroup group, DataCallback<Boolean> uponCompletion);
+
+    Optional<DatastoreSubject> getSubject(UUID uniqueId);
+
+    void getSubject(UUID uniqueId, DataCallback<Optional<DatastoreSubject>> callback);
+
+    boolean hasSubject(UUID uniqueId);
+
+    void hasSubject(UUID uniqueId, DataCallback<Boolean> callback);
+
+    boolean insertSubject(DatastoreSubject subject);
+
+    void insertSubject(DatastoreSubject subject, DataCallback<Boolean> uponCompletion);
+
+    boolean updateSubject(DatastoreSubject subject);
+
+    void updateSubject(DatastoreSubject subject, DataCallback<Boolean> uponCompletion);
+
+    boolean deleteSubject(DatastoreSubject subject);
+
+    void deleteSubject(DatastoreSubject subject, DataCallback<Boolean> uponCompletion);
 }
