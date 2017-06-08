@@ -187,6 +187,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public Optional<DatastoreGroup> getGroup(String name) {
+        checkNotNull(name);
         AtomicReference<DatastoreGroup> reference = new AtomicReference<>(null);
         if (cache.containsKey(name)) {
             reference.set(cache.getOrDefault(name, null));
@@ -207,7 +208,7 @@ public class OrbitDatastore implements Datastore {
                 set.close();
                 statement.close();
             } catch (SQLException error) {
-                logger.log(Level.WARNING, format("Unable to get group with name '%s'!", name), error);
+                logger.log(Level.WARNING, format("Unable to get group with name='%s'!", name), error);
             }
             DatastoreGroup group = reference.get();
             if (group != null) {
@@ -234,10 +235,11 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public boolean insertGroup(DatastoreGroup group) {
+        checkNotNull(group);
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
                     "INSERT INTO %s(name, display_name, parents, prefix, suffix, show_tab, show_tag, show_chat, " +
-                            "color_char, tab_order, permissions) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                            "color_char, tab_order, permissions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     table(DatastoreGroup.class)
             ));
             statement.setString(1, group.getName());
@@ -255,7 +257,7 @@ public class OrbitDatastore implements Datastore {
             statement.close();
             return true;
         } catch (SQLException error) {
-            logger.log(Level.WARNING, format("Unable to insert group with name '%s'!", group.getName()), error);
+            logger.log(Level.WARNING, format("Unable to insert group with name='%s'!", group.getName()), error);
             return false;
         }
     }
@@ -267,6 +269,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public boolean updateGroup(DatastoreGroup group) {
+        checkNotNull(group);
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
                     "UPDATE %s SET display_name=?, parents=?, prefix=?, suffix=?, show_tab=?, show_tag=?, " +
@@ -288,7 +291,7 @@ public class OrbitDatastore implements Datastore {
             statement.close();
             return true;
         } catch (SQLException error) {
-            logger.log(Level.WARNING, format("Unable to update group with name '%s'!", group.getName()), error);
+            logger.log(Level.WARNING, format("Unable to update group with name='%s'!", group.getName()), error);
             return false;
         }
     }
@@ -300,6 +303,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public boolean deleteGroup(DatastoreGroup group) {
+        checkNotNull(group);
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
                     "DELETE FROM %s WHERE name=?",
@@ -310,7 +314,7 @@ public class OrbitDatastore implements Datastore {
             statement.close();
             return true;
         } catch (SQLException error) {
-            logger.log(Level.WARNING, format("Unable to delete group with name '%s'!", group.getName()), error);
+            logger.log(Level.WARNING, format("Unable to delete group with name='%s'!", group.getName()), error);
             return false;
         }
     }
@@ -318,6 +322,173 @@ public class OrbitDatastore implements Datastore {
     @Override
     public void deleteGroup(DatastoreGroup group, DataCallback<Boolean> uponCompletion) {
         fulfill(uponCompletion, deleteGroup(group));
+    }
+
+    @Override
+    public Optional<DatastoreSubject> getSubject(UUID uniqueId) {
+        checkNotNull(uniqueId);
+        AtomicReference<DatastoreSubject> reference = new AtomicReference<>(null);
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(format(
+                    "SELECT * FROM %s WHERE uniqueId=?",
+                    table(DatastoreSubject.class)
+            ));
+            statement.setString(1, uniqueId.toString());
+            ResultSet set = statement.executeQuery();
+            if (!set.isClosed() && set.next()) {
+                DatastoreSubject subject = new DatastoreSubject();
+                subject.readFrom(set);
+                reference.set(subject);
+            }
+            set.close();
+            statement.close();
+        } catch (SQLException error) {
+            logger.log(Level.WARNING, format("Unable to get subject with UUID='%s'!", uniqueId.toString()), error);
+        }
+        DatastoreSubject subject = reference.get();
+        if (subject != null) {
+            getGroup(subject.getGroupName()).ifPresent(subject::setGroup);
+        }
+        return Optional.ofNullable(reference.get());
+    }
+
+    @Override
+    public void getSubject(UUID uniqueId, DataCallback<Optional<DatastoreSubject>> callback) {
+        fulfill(callback, getSubject(uniqueId));
+    }
+
+    @Override
+    public boolean hasSubject(UUID uniqueId) {
+        return getSubject(uniqueId).isPresent();
+    }
+
+    @Override
+    public void hasSubject(UUID uniqueId, DataCallback<Boolean> callback) {
+        fulfill(callback, hasSubject(uniqueId));
+    }
+
+    @Override
+    public List<DatastoreSubject> getSubjectListByGroup(String name) {
+        checkNotNull(name);
+        AtomicReference<List<DatastoreSubject>> reference = new AtomicReference<>(new ArrayList<>());
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(format(
+                    "SELECT * FROM %s WHERE group_name=?",
+                    table(DatastoreSubject.class)
+            ));
+            statement.setString(1, name);
+            ResultSet set = statement.executeQuery();
+            while (!set.isClosed() && set.next()) {
+                DatastoreSubject subject = new DatastoreSubject();
+                subject.readFrom(set);
+                reference.get().add(subject);
+            }
+            set.close();
+            statement.close();
+        } catch (SQLException error) {
+            logger.log(Level.WARNING, format("Unable to get subject list by group with name='%s'!", name), error);
+        }
+        if (reference.get().isEmpty()) {
+            return reference.get();
+        }
+        reference.get().forEach(subject -> {
+            if (subject != null) {
+                getGroup(subject.getGroupName()).ifPresent(subject::setGroup);
+            }
+        });
+        return reference.get();
+    }
+
+    @Override
+    public void getSubjectListByGroup(String name, DataCallback<List<DatastoreSubject>> callback) {
+        fulfill(callback, getSubjectListByGroup(name));
+    }
+
+    @Override
+    public boolean insertSubject(DatastoreSubject subject) {
+        checkNotNull(subject);
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(format(
+                    "INSERT INTO %s(uniqueId, group_name, last_seen, permissions) VALUES (?, ?, ?, ?)",
+                    table(DatastoreSubject.class)
+            ));
+            statement.setString(1, subject.getUniqueId().toString());
+            statement.setString(2, subject.getGroup() == null
+                    ? subject.getGroupName()
+                    : subject.getGroup().getName()
+            );
+            statement.setLong(3, subject.getLastSeen());
+            statement.setString(4, convertSetToString(subject.getPermissionSet(), ";"));
+            statement.executeUpdate();
+            statement.close();
+            return true;
+        } catch (SQLException error) {
+            logger.log(Level.WARNING, format("Unable to insert player with UUID='%s'!",
+                    subject.getUniqueId().toString()),
+                    error);
+            return false;
+        }
+    }
+
+    @Override
+    public void insertSubject(DatastoreSubject subject, DataCallback<Boolean> uponCompletion) {
+        fulfill(uponCompletion, insertSubject(subject));
+    }
+
+    @Override
+    public boolean updateSubject(DatastoreSubject subject) {
+        checkNotNull(subject);
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(format(
+                    "UPDATE %s SET group_name=?, last_seen=?, permissions=? WHERE uniqueId=?",
+                    table(DatastoreSubject.class)
+            ));
+            statement.setString(1, subject.getGroup() == null
+                    ? subject.getGroupName()
+                    : subject.getGroup().getName()
+            );
+            statement.setLong(2, subject.getLastSeen());
+            statement.setString(3, convertSetToString(subject.getPermissionSet(), ";"));
+            statement.setString(4, subject.getUniqueId().toString());
+            statement.executeUpdate();
+            statement.close();
+            return true;
+        } catch (SQLException error) {
+            logger.log(Level.WARNING, format("Unable to update player with UUID='%s'!",
+                    subject.getUniqueId().toString()),
+                    error);
+            return false;
+        }
+    }
+
+    @Override
+    public void updateSubject(DatastoreSubject subject, DataCallback<Boolean> uponCompletion) {
+        fulfill(uponCompletion, updateSubject(subject));
+    }
+
+    @Override
+    public boolean deleteSubject(DatastoreSubject subject) {
+        checkNotNull(subject);
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(format(
+                    "DELETE FROM %s WHERE uniqueId=?",
+                    table(DatastoreSubject.class)
+            ));
+            statement.setString(1, subject.getUniqueId().toString());
+            statement.executeUpdate();
+            statement.close();
+            return true;
+        } catch (SQLException error) {
+            logger.log(Level.WARNING, format("Unable to delete player with UUID='%s'!",
+                    subject.getUniqueId().toString()),
+                    error);
+            return false;
+        }
+    }
+
+    @Override
+    public void deleteSubject(DatastoreSubject subject, DataCallback<Boolean> uponCompletion) {
+        fulfill(uponCompletion, deleteSubject(subject));
     }
 
     @Override
