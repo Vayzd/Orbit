@@ -50,7 +50,8 @@ public class OrbitDatastore implements Datastore {
     private final AtomicReference<Thread> primaryThread = new AtomicReference<>();
     private final ConcurrentMap<String, DatastoreGroup> cache = new ConcurrentHashMap<>();
 
-    private OrbitDatastore(Logger logger, DatastoreCredentials credentials, Thread primary, int poolSize) {
+    private OrbitDatastore(Logger logger, DatastoreCredentials credentials, Thread primary,
+                           int poolSize) throws Exception {
         checkNotNull(logger, "Datastore logger can't be null");
         checkNotNull(credentials, "Credentials can't be null");
         checkArgument(poolSize >= 0, "Pool size must be greater than or equal to 0");
@@ -365,4 +366,14 @@ public class OrbitDatastore implements Datastore {
                     "PRIMARY(`name`), UNIQUE(`tabOrder`)" +
                     ") DEFAULT CHARSET=utf8;", table(DatastoreGroup.class))
     ));
+
+    private static volatile Datastore datastore = null;
+
+    public static Datastore createDatastore(Logger logger, DatastoreCredentials credentials, Thread primary,
+                                         int poolSize) throws Exception {
+        if (datastore == null) {
+            datastore = new OrbitDatastore(logger, credentials, primary, poolSize);
+        }
+        return datastore;
+    }
 }
