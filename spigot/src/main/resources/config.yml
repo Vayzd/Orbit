@@ -1,0 +1,14 @@
+# Orbit Spigot Plugin: ${project.parent.description}
+#
+# Insert database connection credentials here:
+# (Supported databases: MySQL and MariaDB)
+database:
+  hostname: localhost
+  port: 3306
+  username: unknown
+  password: unknown
+  defaultDatabase: unknown
+
+# Amount of concurrent asynchronous database threads
+# (Maximum is limited by this machines CPU cores/threads (Hyper-Threading).
+pool-size: 1
