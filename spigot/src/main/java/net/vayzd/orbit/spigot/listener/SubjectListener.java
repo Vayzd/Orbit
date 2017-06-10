@@ -28,11 +28,11 @@ import lombok.*;
 import net.vayzd.orbit.datastore.group.*;
 import net.vayzd.orbit.spigot.*;
 import net.vayzd.orbit.spigot.permissible.*;
+import net.vayzd.orbit.spigot.reflect.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.player.*;
 
-import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.*;
@@ -81,10 +81,9 @@ public class SubjectListener implements Listener {
 
     private void injectPermissions(final Player player, final DatastoreSubject subject) {
         try {
-            Class<?> entity = Class.forName("org.bukkit.craftbukkit.entity.CraftHumanEntity");
-            Field perm = entity.getDeclaredField("perm");
-            perm.setAccessible(true);
-            perm.set(player, new DatastorePermissible(player, subject));
+            Class<?> entity = ReflectionUtil.getClassFromOBC("entity.CraftHumanEntity");
+            ReflectionUtil.getAccessibleField(entity, "perm")
+                    .set(player, new DatastorePermissible(player, subject));
         } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException error) {
             plugin.getLogger().log(Level.WARNING, "Unable to inject permissions!", error);
         }
