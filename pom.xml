@@ -38,6 +38,7 @@
 
     <modules>
         <module>datastore</module>
+        <module>proxy</module>
         <module>spigot</module>
     </modules>
 
