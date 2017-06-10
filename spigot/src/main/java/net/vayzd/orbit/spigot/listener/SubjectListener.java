@@ -47,21 +47,16 @@ public class SubjectListener implements Listener {
     public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
         if (event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.ALLOWED)) {
             final UUID uniqueId = event.getUniqueId();
-            DatastoreSubject result = plugin.getDatastore().getSubject(uniqueId).orElseGet(() -> {
-                DatastoreSubject subject = new DatastoreSubject();
-                subject.setUniqueId(uniqueId);
-                Optional<DatastoreGroup> defaultGroup = plugin.getDatastore().getDefaultGroup();
-                if (defaultGroup.isPresent()) {
-                    DatastoreGroup group = defaultGroup.get();
-                    subject.setGroup(group);
-                    subject.setGroupName(group.getName());
-                } else {
-                    subject.setGroupName("default");
-                }
-                plugin.getDatastore().insertSubject(subject);
-                return subject;
+            DatastoreSubject subject = plugin.getDatastore().getSubject(uniqueId).orElseGet(() -> {
+                DatastoreSubject preset = new DatastoreSubject();
+                preset.setUniqueId(uniqueId);
+                plugin.getDatastore().getDefaultGroup().ifPresent(defaultGroup -> {
+                    preset.setGroup(defaultGroup);
+                    preset.setGroupName(defaultGroup.getName());
+                });
+                return preset;
             });
-            subjectMap.putIfAbsent(uniqueId, result);
+            subjectMap.putIfAbsent(uniqueId, subject);
         }
     }
 
