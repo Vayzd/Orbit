@@ -227,7 +227,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void getGroup(String name, DataCallback<Optional<DatastoreGroup>> callback) {
-        fulfill(callback, getGroup(name));
+        fulfill(callback, () -> getGroup(name));
     }
 
     @Override
@@ -237,7 +237,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void hasGroup(String name, DataCallback<Boolean> callback) {
-        fulfill(callback, hasGroup(name));
+        fulfill(callback, () -> hasGroup(name));
     }
 
     @Override
@@ -282,7 +282,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void insertGroup(DatastoreGroup group, DataCallback<Boolean> uponCompletion) {
-        fulfill(uponCompletion, insertGroup(group));
+        fulfill(uponCompletion, () -> insertGroup(group));
     }
 
     @Override
@@ -317,7 +317,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void updateGroup(DatastoreGroup group, DataCallback<Boolean> uponCompletion) {
-        fulfill(uponCompletion, updateGroup(group));
+        fulfill(uponCompletion, () -> updateGroup(group));
     }
 
     @Override
@@ -340,7 +340,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void deleteGroup(DatastoreGroup group, DataCallback<Boolean> uponCompletion) {
-        fulfill(uponCompletion, deleteGroup(group));
+        fulfill(uponCompletion, () -> deleteGroup(group));
     }
 
     @Override
@@ -373,7 +373,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void getSubject(UUID uniqueId, DataCallback<Optional<DatastoreSubject>> callback) {
-        fulfill(callback, getSubject(uniqueId));
+        fulfill(callback, () -> getSubject(uniqueId));
     }
 
     @Override
@@ -383,7 +383,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void hasSubject(UUID uniqueId, DataCallback<Boolean> callback) {
-        fulfill(callback, hasSubject(uniqueId));
+        fulfill(callback, () -> hasSubject(uniqueId));
     }
 
     @Override
@@ -420,7 +420,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void getSubjectListByGroup(String name, DataCallback<List<DatastoreSubject>> callback) {
-        fulfill(callback, getSubjectListByGroup(name));
+        fulfill(callback, () -> getSubjectListByGroup(name));
     }
 
     @Override
@@ -450,7 +450,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void insertSubject(DatastoreSubject subject, DataCallback<Boolean> uponCompletion) {
-        fulfill(uponCompletion, insertSubject(subject));
+        fulfill(uponCompletion, () -> insertSubject(subject));
     }
 
     @Override
@@ -480,7 +480,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void updateSubject(DatastoreSubject subject, DataCallback<Boolean> uponCompletion) {
-        fulfill(uponCompletion, updateSubject(subject));
+        fulfill(uponCompletion, () -> updateSubject(subject));
     }
 
     @Override
@@ -505,7 +505,7 @@ public class OrbitDatastore implements Datastore {
 
     @Override
     public void deleteSubject(DatastoreSubject subject, DataCallback<Boolean> uponCompletion) {
-        fulfill(uponCompletion, deleteSubject(subject));
+        fulfill(uponCompletion, () -> deleteSubject(subject));
     }
 
     @Override
@@ -550,12 +550,13 @@ public class OrbitDatastore implements Datastore {
         }
     }
 
-    private <T> void fulfill(final DataCallback<T> callback, final T result) {
+    private <T> void fulfill(final DataCallback<T> callback, final Callable<T> result) {
         submitTask(() -> {
             try {
-                checkNotNull(callback, "DataCallback<T> (async result) can't be null");
-                callback.complete(result, null);
-            } catch (NullPointerException error) {
+                checkNotNull(callback);
+                checkNotNull(result);
+                callback.complete(result.call(), null);
+            } catch (Exception error) {
                 callback.complete(null, error);
                 error.printStackTrace();
             }
