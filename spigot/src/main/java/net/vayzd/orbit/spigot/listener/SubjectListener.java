@@ -50,8 +50,11 @@ public class SubjectListener implements Listener {
             DatastoreSubject result = plugin.getDatastore().getSubject(uniqueId).orElseGet(() -> {
                 DatastoreSubject subject = new DatastoreSubject();
                 subject.setUniqueId(uniqueId);
-                if (plugin.getDatastore().hasDefaultGroup()) {
-                    plugin.getDatastore().getDefaultGroup().ifPresent(subject::setGroup);
+                Optional<DatastoreGroup> defaultGroup = plugin.getDatastore().getDefaultGroup();
+                if (defaultGroup.isPresent()) {
+                    DatastoreGroup group = defaultGroup.get();
+                    subject.setGroup(group);
+                    subject.setGroupName(group.getName());
                 } else {
                     subject.setGroupName("default");
                 }
