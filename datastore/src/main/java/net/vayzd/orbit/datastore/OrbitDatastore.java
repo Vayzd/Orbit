@@ -359,16 +359,7 @@ public class OrbitDatastore implements Datastore {
         } catch (SQLException error) {
             logger.log(Level.WARNING, format("Unable to get subject with UUID='%s'!", uniqueId.toString()), error);
         }
-        DatastoreSubject subject = reference.get();
-        if (subject != null) {
-            Optional<DatastoreGroup> group = getGroup(subject.getGroupName());
-            if (group.isPresent()) {
-                subject.setGroup(group.get());
-            } else {
-                subject.setGroup(defaultGroup.get());
-            }
-        }
-        return Optional.ofNullable(reference.get());
+        return Optional.ofNullable(finalizeSubject(reference.get()));
     }
 
     @Override
@@ -410,16 +401,7 @@ public class OrbitDatastore implements Datastore {
         if (reference.get().isEmpty()) {
             return reference.get();
         }
-        reference.get().forEach(subject -> {
-            if (subject != null) {
-                Optional<DatastoreGroup> group = getGroup(subject.getGroupName());
-                if (group.isPresent()) {
-                    subject.setGroup(group.get());
-                } else {
-                    subject.setGroup(defaultGroup.get());
-                }
-            }
-        });
+        reference.get().forEach(this::finalizeSubject);
         return reference.get();
     }
 
@@ -542,6 +524,19 @@ public class OrbitDatastore implements Datastore {
             }
         });
         return builder.toString();
+    }
+
+    private DatastoreSubject finalizeSubject(DatastoreSubject subject) {
+        if (subject != null) {
+            Optional<DatastoreGroup> group = getGroup(subject.getGroupName());
+            if (group.isPresent()) {
+                subject.setGroup(group.get());
+            } else {
+                subject.setGroup(defaultGroup.get());
+            }
+            subject.updatePermissionSet(subject.getCombinedPermissionSet());
+        }
+        return subject;
     }
 
     private void submitTask(final Runnable task) {
