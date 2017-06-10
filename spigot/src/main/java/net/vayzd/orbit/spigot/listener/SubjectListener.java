@@ -25,6 +25,8 @@
 package net.vayzd.orbit.spigot.listener;
 
 import lombok.*;
+import net.md_5.bungee.api.*;
+import net.md_5.bungee.api.chat.*;
 import net.vayzd.orbit.datastore.group.*;
 import net.vayzd.orbit.spigot.*;
 import net.vayzd.orbit.spigot.permissible.*;
@@ -40,6 +42,12 @@ import java.util.logging.*;
 @RequiredArgsConstructor
 public class SubjectListener implements Listener {
 
+    private final BaseComponent[] UNEXPECTED_ERROR = new ComponentBuilder("")
+            .append("An unexpected error occured whilst logging in.")
+            .color(ChatColor.RED)
+            .append("\n\nPlease try to reconnect!")
+            .color(ChatColor.GREEN)
+            .create();
     private final ConcurrentMap<UUID, DatastoreSubject> subjectMap = new ConcurrentHashMap<>();
     private final OrbitSpigotPlugin plugin;
 
@@ -69,7 +77,7 @@ public class SubjectListener implements Listener {
             if (subject == null) {
                 event.disallow(
                         PlayerLoginEvent.Result.KICK_OTHER,
-                        "§cAn unexpected error occured. Please try to reconnect!"
+                        TextComponent.toLegacyText(UNEXPECTED_ERROR)
                 );
                 return;
             }
