@@ -366,7 +366,12 @@ public class OrbitDatastore implements Datastore {
         }
         DatastoreSubject subject = reference.get();
         if (subject != null) {
-            getGroup(subject.getGroupName()).ifPresent(subject::setGroup);
+            Optional<DatastoreGroup> group = getGroup(subject.getGroupName());
+            if (group.isPresent()) {
+                subject.setGroup(group.get());
+            } else {
+                subject.setGroup(defaultGroup.get());
+            }
         }
         return Optional.ofNullable(reference.get());
     }
@@ -412,7 +417,12 @@ public class OrbitDatastore implements Datastore {
         }
         reference.get().forEach(subject -> {
             if (subject != null) {
-                getGroup(subject.getGroupName()).ifPresent(subject::setGroup);
+                Optional<DatastoreGroup> group = getGroup(subject.getGroupName());
+                if (group.isPresent()) {
+                    subject.setGroup(group.get());
+                } else {
+                    subject.setGroup(defaultGroup.get());
+                }
             }
         });
         return reference.get();
