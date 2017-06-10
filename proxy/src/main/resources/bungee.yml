@@ -1,0 +1,5 @@
+name: ${project.parent.name}
+main: net.vayzd.orbit.proxy.OrbitProxyPlugin
+author: MrRumpunsh
+version: ${project.parent.version}
+description: ${project.parent.description}
