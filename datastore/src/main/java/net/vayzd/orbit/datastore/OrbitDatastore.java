@@ -533,7 +533,6 @@ public class OrbitDatastore implements Datastore {
 
     private <T> String convertSetToString(final Set<T> set) {
         checkNotNull(set);
-        checkArgument(!set.isEmpty());
         AtomicInteger remaining = new AtomicInteger(set.size());
         StringBuilder builder = new StringBuilder();
         set.forEach(nextEntry -> {
