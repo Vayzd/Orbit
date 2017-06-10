@@ -28,16 +28,11 @@ import lombok.*;
 import net.vayzd.orbit.datastore.*;
 import net.vayzd.orbit.datastore.group.*;
 import net.vayzd.orbit.spigot.listener.*;
-import org.bukkit.event.*;
-import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.*;
 
-import java.util.*;
 import java.util.logging.*;
 
-import static java.util.Arrays.*;
-
-public class OrbitSpigotPlugin extends JavaPlugin implements Listener {
+public class OrbitSpigotPlugin extends JavaPlugin {
 
     @Getter
     private Datastore datastore;
@@ -77,7 +72,6 @@ public class OrbitSpigotPlugin extends JavaPlugin implements Listener {
         } catch (Exception error) {
             shutdownDueToDatastoreFailure(error);
         }
-        getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new SubjectListener(this), this);
     }
 
@@ -87,88 +81,14 @@ public class OrbitSpigotPlugin extends JavaPlugin implements Listener {
         });
     }
 
-    @EventHandler
-    public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
-        /*Optional<DatastoreGroup> found = datastore.getGroup("default");
-        if (found.isPresent()) {
-            getLogger().info("Group with name 'default' is present in database!");
-            getLogger().info(found.get().toString());
-        } else {
-            getLogger().warning("Unable to find group with name 'default'!");
-        }*/
-        Optional<DatastoreSubject> result = datastore.getSubject(event.getUniqueId());
-        if (result.isPresent()) {
-            getLogger().info("");
-            getLogger().info("Found subject by UUID '" + event.getUniqueId().toString() + "'");
-            getLogger().info("");
-            getLogger().info(result.get().toString());
-            getLogger().info("");
-        } else {
-            getLogger().warning("");
-            getLogger().warning("Unable to find subject by UUID '" + event.getUniqueId().toString() + "'");
-            getLogger().warning("Inserting it...");
-            getLogger().warning("");
-            datastore.insertSubject(result.orElseGet(() -> {
-                DatastoreSubject subject = new DatastoreSubject();
-                subject.setUniqueId(event.getUniqueId());
-                subject.setGroupName("default");
-                subject.updatePermissionSet(new TreeSet<>(asList("test.1", "test.2")));
-                return subject;
-            }), (success, error) -> {
-                if (error == null && success) {
-                    getLogger().info("");
-                    getLogger().info("Successfully inserted!");
-                    getLogger().info("");
-                } else {
-                    getLogger().warning("");
-                    getLogger().log(Level.WARNING, "Unable to insert subject!", error);
-                    getLogger().warning("");
-                }
-            });
-        }
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        /*datastore.getGroup("brutal", (found, error) -> {
-            if (error == null) {
-                if (found.isPresent()) {
-                    getLogger().info("Group with name 'default' is present in database!");
-                    getLogger().info(found.get().toString());
-                } else {
-                    getLogger().warning("Unable to find group with name 'default'!");
-                }
-            } else {
-                getLogger().warning("Unable to find group with name 'default'!");
-            }
-        });*/
-        datastore.getSubject(event.getPlayer().getUniqueId(), (result, error) -> {
-            if (error == null) {
-                if (result.isPresent()) {
-                    getLogger().info("");
-                    getLogger().info("Found subject by UUID '" + event.getPlayer().getUniqueId().toString() + "'");
-                    getLogger().info("");
-                    getLogger().info(result.get().toString());
-                    getLogger().info("");
-                } else {
-                    getLogger().warning("Unable to find subject!");
-                }
-            } else {
-                getLogger().warning("Unable to find subject!");
-            }
-        });
-    }
-
     private DatastoreGroup newDefaultGroup() {
         DatastoreGroup defaultGroup = new DatastoreGroup();
         defaultGroup.setName("default");
-        defaultGroup.getParentSet().add(""); // no parents
         defaultGroup.setDefaultGroup(true);
         defaultGroup.setDisplayName("Default");
         defaultGroup.setPrefix("");
         defaultGroup.setSuffix("");
         defaultGroup.setTabOrder(32767); // max "SMALLINT" value
-        defaultGroup.getPermissionSet().add(""); // no permissions
         return defaultGroup;
     }
 
