@@ -260,7 +260,7 @@ public class OrbitDatastore implements Datastore {
                     table(DatastoreGroup.class)
             ));
             statement.setString(1, group.getName());
-            statement.setString(2, convertSetToString(group.getParentSet(), ";"));
+            statement.setString(2, convertSetToString(group.getParentSet()));
             statement.setBoolean(3, group.isDefaultGroup());
             statement.setString(4, group.getDisplayName());
             statement.setString(5, group.getPrefix());
@@ -270,7 +270,7 @@ public class OrbitDatastore implements Datastore {
             statement.setBoolean(9, group.isShowChat());
             statement.setString(10, String.valueOf(group.getColorChar()));
             statement.setInt(11, group.getTabOrder());
-            statement.setString(12, convertSetToString(group.getPermissionSet(), ";"));
+            statement.setString(12, convertSetToString(group.getPermissionSet()));
             statement.executeUpdate();
             statement.close();
             return true;
@@ -294,7 +294,7 @@ public class OrbitDatastore implements Datastore {
                             "show_chat=?, color=?, order=?, permissions=? WHERE name=?",
                     table(DatastoreGroup.class)
             ));
-            statement.setString(1, convertSetToString(group.getParentSet(), ";"));
+            statement.setString(1, convertSetToString(group.getParentSet()));
             statement.setBoolean(2, group.isDefaultGroup());
             statement.setString(3, group.getDisplayName());
             statement.setString(4, group.getPrefix());
@@ -304,7 +304,7 @@ public class OrbitDatastore implements Datastore {
             statement.setBoolean(8, group.isShowChat());
             statement.setString(9, String.valueOf(group.getColorChar()));
             statement.setInt(10, group.getTabOrder());
-            statement.setString(11, convertSetToString(group.getPermissionSet(), ";"));
+            statement.setString(11, convertSetToString(group.getPermissionSet()));
             statement.setString(12, group.getName());
             statement.executeUpdate();
             statement.close();
@@ -436,7 +436,7 @@ public class OrbitDatastore implements Datastore {
                     ? subject.getGroupName()
                     : subject.getGroup().getName()
             );
-            statement.setString(3, convertSetToString(subject.getPermissionSet(), ";"));
+            statement.setString(3, convertSetToString(subject.getPermissionSet()));
             statement.executeUpdate();
             statement.close();
             return true;
@@ -465,7 +465,7 @@ public class OrbitDatastore implements Datastore {
                     ? subject.getGroupName()
                     : subject.getGroup().getName()
             );
-            statement.setString(2, convertSetToString(subject.getPermissionSet(), ";"));
+            statement.setString(2, convertSetToString(subject.getPermissionSet()));
             statement.setString(3, subject.getUniqueId().toString());
             statement.executeUpdate();
             statement.close();
@@ -526,17 +526,15 @@ public class OrbitDatastore implements Datastore {
         return PermissionCalculator.of(group, this);
     }
 
-    private <T> String convertSetToString(final Set<T> set, final String separator) {
+    private <T> String convertSetToString(final Set<T> set) {
         checkNotNull(set);
         checkArgument(!set.isEmpty());
-        checkNotNull(separator);
-        checkArgument(!separator.isEmpty());
         AtomicInteger remaining = new AtomicInteger(set.size());
         StringBuilder builder = new StringBuilder();
         set.forEach(nextEntry -> {
             builder.append(nextEntry);
             if (remaining.decrementAndGet() != 0) {
-                builder.append(separator);
+                builder.append(";");
             }
         });
         return builder.toString();
