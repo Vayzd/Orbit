@@ -31,6 +31,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-config</artifactId>
+            <scope>provided</scope>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>net.vayzd</groupId>
             <artifactId>orbit-datastore</artifactId>
             <scope>compile</scope>
