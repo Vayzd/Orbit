@@ -47,7 +47,8 @@ public class PermissionCalculator {
         TreeSet<String> permissionSet = new TreeSet<>();
         for (String ancestor : calculateGroupTree()) {
             for (String permission : getGroupFor(ancestor).getPermissionSet()) {
-                if (permissionSet.contains(permission)) {
+                if (permission.isEmpty() || permission.contains(" ") || permission.equalsIgnoreCase(ancestor)
+                        || permissionSet.contains(permission)) {
                     continue;
                 }
                 permissionSet.add(permission);
