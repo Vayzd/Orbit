@@ -28,12 +28,12 @@ import lombok.*;
 import org.bukkit.*;
 
 import java.lang.reflect.*;
-import java.util.*;
 
 import static com.google.common.base.Preconditions.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class ReflectionUtil {
 
     private static String versionString;
@@ -60,9 +60,6 @@ public class ReflectionUtil {
         String[] packageComponentArray = Bukkit.getServer().getClass().getPackage().getName()
                 .replace(".", ",")
                 .split(",");
-
-        System.out.println("packageComponentArray = " + Arrays.toString(packageComponentArray));
-
         versionString = packageComponentArray[3];
     }
 }
