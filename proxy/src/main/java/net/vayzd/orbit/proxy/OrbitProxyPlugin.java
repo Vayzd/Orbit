@@ -30,6 +30,7 @@ import net.md_5.bungee.api.plugin.*;
 import net.md_5.bungee.config.*;
 import net.vayzd.orbit.datastore.*;
 import net.vayzd.orbit.datastore.group.*;
+import net.vayzd.orbit.proxy.listener.*;
 
 import java.io.*;
 import java.util.logging.*;
@@ -44,7 +45,7 @@ public class OrbitProxyPlugin extends Plugin {
         saveDefaultConfig();
         getLogger().info("Connecting to database...");
         try {
-            Configuration configuration = YamlConfiguration.getProvider(ConfigurationProvider.class).load(
+            Configuration configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(
                     new File(getDataFolder(), "config.yml")
             );
             datastore = OrbitDatastore.createDatastore(
@@ -64,7 +65,7 @@ public class OrbitProxyPlugin extends Plugin {
                     datastore.fetchAndCacheGroups();
                     if (!datastore.hasDefaultGroup()) {
                         datastore.insertGroup(newDefaultGroup(), (success, failure) -> {
-                            if (success && failure == null) {
+                            if (success != null && success && failure == null) {
                                 datastore.fetchAndCacheGroups(); // cache again.
                             }
                         });
@@ -77,6 +78,7 @@ public class OrbitProxyPlugin extends Plugin {
         } catch (Exception error) {
             shutdownDueToDatastoreFailure(error);
         }
+        getProxy().getPluginManager().registerListener(this, new SubjectListener(this));
     }
 
     @Override
@@ -104,13 +106,11 @@ public class OrbitProxyPlugin extends Plugin {
     private DatastoreGroup newDefaultGroup() {
         DatastoreGroup defaultGroup = new DatastoreGroup();
         defaultGroup.setName("default");
-        defaultGroup.getParentSet().add(""); // no parents
         defaultGroup.setDefaultGroup(true);
         defaultGroup.setDisplayName("Default");
         defaultGroup.setPrefix("");
         defaultGroup.setSuffix("");
         defaultGroup.setTabOrder(32767); // max "SMALLINT" value
-        defaultGroup.getPermissionSet().add(""); // no permissions
         return defaultGroup;
     }
 
