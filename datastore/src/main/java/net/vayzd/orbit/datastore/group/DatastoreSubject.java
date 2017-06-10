@@ -36,6 +36,7 @@ import static com.google.common.base.Preconditions.*;
 @Getter
 @Setter
 @ToString
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class DatastoreSubject implements DatastoreEntry {
 
     private final PermissionMatcher matcher;

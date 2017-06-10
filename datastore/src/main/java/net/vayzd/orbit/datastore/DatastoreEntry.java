@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public interface DatastoreEntry {
 
     void readFrom(ResultSet set) throws SQLException;
@@ -39,8 +40,6 @@ public interface DatastoreEntry {
         String value = set.getString(columnIndex);
         try {
             checkNotNull(value);
-            checkArgument(!value.isEmpty());
-            checkArgument(value.contains(";"));
             return new TreeSet<>(asList(value.split(";")));
         } catch (NullPointerException | IllegalArgumentException ignored) {
             return new TreeSet<>(singletonList("default"));
