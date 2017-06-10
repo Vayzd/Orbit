@@ -29,6 +29,7 @@ import lombok.*;
 import net.md_5.bungee.api.plugin.*;
 import net.md_5.bungee.config.*;
 import net.vayzd.orbit.datastore.*;
+import net.vayzd.orbit.datastore.group.*;
 
 import java.io.*;
 import java.util.logging.*;
@@ -61,6 +62,13 @@ public class OrbitProxyPlugin extends Plugin {
             datastore.connect((result, error) -> {
                 if (error == null) {
                     datastore.fetchAndCacheGroups();
+                    if (!datastore.hasDefaultGroup()) {
+                        datastore.insertGroup(newDefaultGroup(), (success, failure) -> {
+                            if (success && failure == null) {
+                                datastore.fetchAndCacheGroups(); // cache again.
+                            }
+                        });
+                    }
                 } else {
                     shutdownDueToDatastoreFailure(error);
                 }
@@ -91,6 +99,19 @@ public class OrbitProxyPlugin extends Plugin {
                 }
             }
         }
+    }
+
+    private DatastoreGroup newDefaultGroup() {
+        DatastoreGroup defaultGroup = new DatastoreGroup();
+        defaultGroup.setName("default");
+        defaultGroup.getParentSet().add(""); // no parents
+        defaultGroup.setDefaultGroup(true);
+        defaultGroup.setDisplayName("Default");
+        defaultGroup.setPrefix("");
+        defaultGroup.setSuffix("");
+        defaultGroup.setTabOrder(32767); // max "SMALLINT" value
+        defaultGroup.getPermissionSet().add(""); // no permissions
+        return defaultGroup;
     }
 
     private void shutdownDueToDatastoreFailure(Throwable error) {

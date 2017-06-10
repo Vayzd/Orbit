@@ -62,6 +62,13 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
             datastore.connect((result, error) -> {
                 if (error == null) {
                     datastore.fetchAndCacheGroups();
+                    if (!datastore.hasDefaultGroup()) {
+                        datastore.insertGroup(newDefaultGroup(), (success, failure) -> {
+                            if (success != null && success && failure == null) {
+                                datastore.fetchAndCacheGroups(); // cache again.
+                            }
+                        });
+                    }
                 } else {
                     shutdownDueToDatastoreFailure(error);
                 }
@@ -150,6 +157,19 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
                 getLogger().warning("Unable to find subject!");
             }
         });
+    }
+
+    private DatastoreGroup newDefaultGroup() {
+        DatastoreGroup defaultGroup = new DatastoreGroup();
+        defaultGroup.setName("default");
+        defaultGroup.getParentSet().add(""); // no parents
+        defaultGroup.setDefaultGroup(true);
+        defaultGroup.setDisplayName("Default");
+        defaultGroup.setPrefix("");
+        defaultGroup.setSuffix("");
+        defaultGroup.setTabOrder(32767); // max "SMALLINT" value
+        defaultGroup.getPermissionSet().add(""); // no permissions
+        return defaultGroup;
     }
 
     private void shutdownDueToDatastoreFailure(Throwable error) {
