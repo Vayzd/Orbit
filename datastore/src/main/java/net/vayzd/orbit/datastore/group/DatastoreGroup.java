@@ -36,6 +36,7 @@ import static com.google.common.base.Preconditions.*;
 @Getter
 @Setter
 @ToString
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class DatastoreGroup implements DatastoreEntry {
 
     private final PermissionMatcher matcher;
@@ -45,9 +46,6 @@ public class DatastoreGroup implements DatastoreEntry {
     private String displayName = null;
     private String prefix = null,
             suffix = null;
-    private boolean showTab = false,
-            showTag = false,
-            showChat = false;
     // 'f' is color code of ChatColor.WHITE (bukkit and bungeecord)
     private char colorChar = 'f';
     // ascending ordering
@@ -85,11 +83,8 @@ public class DatastoreGroup implements DatastoreEntry {
         setDisplayName(set.getString(4));
         setPrefix(set.getString(5));
         setSuffix(set.getString(6));
-        setShowTab(set.getBoolean(7));
-        setShowTag(set.getBoolean(8));
-        setShowChat(set.getBoolean(9));
-        setColorChar(set.getString(10).charAt(0));
-        setTabOrder(set.getInt(11));
-        setPermissionSet(getSetFromString(set, 12));
+        setColorChar(set.getString(7).charAt(0));
+        setTabOrder(set.getInt(8));
+        setPermissionSet(getSetFromString(set, 9));
     }
 }

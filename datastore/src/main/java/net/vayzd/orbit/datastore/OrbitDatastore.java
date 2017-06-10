@@ -38,6 +38,7 @@ import static com.google.common.base.Preconditions.*;
 import static java.lang.String.*;
 import static java.util.Arrays.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class OrbitDatastore implements Datastore {
 
     private final HikariConfig config;
@@ -255,8 +256,8 @@ public class OrbitDatastore implements Datastore {
         checkNotNull(group);
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
-                    "INSERT INTO %s(name, parents, default_group, display_name, prefix, suffix, show_tab, show_tag, show_chat, " +
-                            "color_char, tab_order, permissions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "INSERT INTO %s(name, parents, default_group, display_name, prefix, suffix, color_char, " +
+                            "tab_order, permissions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     table(DatastoreGroup.class)
             ));
             statement.setString(1, group.getName());
@@ -265,12 +266,9 @@ public class OrbitDatastore implements Datastore {
             statement.setString(4, group.getDisplayName());
             statement.setString(5, group.getPrefix());
             statement.setString(6, group.getSuffix());
-            statement.setBoolean(7, group.isShowTab());
-            statement.setBoolean(8, group.isShowTag());
-            statement.setBoolean(9, group.isShowChat());
-            statement.setString(10, String.valueOf(group.getColorChar()));
-            statement.setInt(11, group.getTabOrder());
-            statement.setString(12, convertSetToString(group.getPermissionSet()));
+            statement.setString(7, String.valueOf(group.getColorChar()));
+            statement.setInt(8, group.getTabOrder());
+            statement.setString(9, convertSetToString(group.getPermissionSet()));
             statement.executeUpdate();
             statement.close();
             return true;
@@ -290,8 +288,8 @@ public class OrbitDatastore implements Datastore {
         checkNotNull(group);
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement(format(
-                    "UPDATE %s SET parents=?, default_group=?, display_name=?, prefix=?, suffix=?, show_tab=?, show_tag=?, " +
-                            "show_chat=?, color=?, order=?, permissions=? WHERE name=?",
+                    "UPDATE %s SET parents=?, default_group=?, display_name=?, prefix=?, suffix=?, color_char=?, " +
+                            "tab_order=?, permissions=? WHERE name=?",
                     table(DatastoreGroup.class)
             ));
             statement.setString(1, convertSetToString(group.getParentSet()));
@@ -299,13 +297,10 @@ public class OrbitDatastore implements Datastore {
             statement.setString(3, group.getDisplayName());
             statement.setString(4, group.getPrefix());
             statement.setString(5, group.getSuffix());
-            statement.setBoolean(6, group.isShowTab());
-            statement.setBoolean(7, group.isShowTag());
-            statement.setBoolean(8, group.isShowChat());
-            statement.setString(9, String.valueOf(group.getColorChar()));
-            statement.setInt(10, group.getTabOrder());
-            statement.setString(11, convertSetToString(group.getPermissionSet()));
-            statement.setString(12, group.getName());
+            statement.setString(6, String.valueOf(group.getColorChar()));
+            statement.setInt(7, group.getTabOrder());
+            statement.setString(8, convertSetToString(group.getPermissionSet()));
+            statement.setString(9, group.getName());
             statement.executeUpdate();
             statement.close();
             return true;
@@ -582,9 +577,6 @@ public class OrbitDatastore implements Datastore {
                     "`display_name` VARCHAR(16) NOT NULL, " +
                     "`prefix` VARCHAR(16) NOT NULL, " +
                     "`suffix` VARCHAR(16) NOT NULL, " +
-                    "`show_tab` BOOLEAN NOT NULL, " +
-                    "`show_tag` BOOLEAN NOT NULL, " +
-                    "`show_chat` BOOLEAN NOT NULL, " +
                     "`color_char` CHAR(1) NOT NULL, " +
                     "`tab_order` SMALLINT NOT NULL, " +
                     "`permissions` TEXT NOT NULL, " +
