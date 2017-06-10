@@ -27,6 +27,7 @@ package net.vayzd.orbit.spigot;
 import lombok.*;
 import net.vayzd.orbit.datastore.*;
 import net.vayzd.orbit.datastore.group.*;
+import net.vayzd.orbit.spigot.listener.*;
 import org.bukkit.event.*;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.*;
@@ -70,6 +71,7 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
             shutdownDueToDatastoreFailure(error);
         }
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new SubjectListener(this), this);
     }
 
     @EventHandler
