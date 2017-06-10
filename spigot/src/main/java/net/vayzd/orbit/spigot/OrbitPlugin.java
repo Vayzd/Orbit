@@ -74,6 +74,12 @@ public class OrbitPlugin extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new SubjectListener(this), this);
     }
 
+    @Override
+    public void onDisable() {
+        datastore.disconnect((success, error) -> {
+        });
+    }
+
     @EventHandler
     public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
         /*Optional<DatastoreGroup> found = datastore.getGroup("default");
