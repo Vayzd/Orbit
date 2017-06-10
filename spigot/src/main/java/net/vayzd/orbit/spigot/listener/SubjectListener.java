@@ -41,7 +41,7 @@ import java.util.logging.*;
 public class SubjectListener implements Listener {
 
     private final ConcurrentMap<UUID, DatastoreSubject> subjectMap = new ConcurrentHashMap<>();
-    private final OrbitPlugin plugin;
+    private final OrbitSpigotPlugin plugin;
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {

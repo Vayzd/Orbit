@@ -37,7 +37,7 @@ import java.util.logging.*;
 
 import static java.util.Arrays.*;
 
-public class OrbitPlugin extends JavaPlugin implements Listener {
+public class OrbitSpigotPlugin extends JavaPlugin implements Listener {
 
     @Getter
     private Datastore datastore;

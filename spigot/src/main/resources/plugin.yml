@@ -1,5 +1,5 @@
 name: ${project.parent.name}
-main: net.vayzd.orbit.spigot.OrbitPlugin
+main: net.vayzd.orbit.spigot.OrbitSpigotPlugin
 author: MrRumpunsh
 version: ${project.parent.version}
 description: ${project.parent.description}
