@@ -95,13 +95,11 @@ public class SubjectListener implements Listener {
             player.disconnect(UNEXPECTED_ERROR);
             return;
         }
-        for (String permission : subject.getCombinedPermissionSet()) {
-            if (!permission.startsWith("-")) {
-                player.setPermission(permission, true);
-            } else {
-                player.setPermission(permission, false);
+        subject.getCombinedPermissionSet().forEach(permission -> {
+            if (permission != null) {
+                player.setPermission(permission, subject.hasPermission(permission));
             }
-        }
+        });
         plugin.getProxy().getPluginManager().callEvent(new OrbitPostLoginEvent(player));
     }
 
