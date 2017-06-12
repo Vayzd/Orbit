@@ -68,7 +68,7 @@ public class SubjectListener implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent event) {
         if (event.getResult().equals(PlayerLoginEvent.Result.ALLOWED)) {
             final Player player = event.getPlayer();
