@@ -41,7 +41,6 @@ public class DatastoreSubject implements DatastoreEntry {
 
     private final PermissionMatcher matcher;
     private UUID uniqueId = null;
-    @Deprecated
     private String groupName = null;
     private DatastoreGroup group = null;
     @Setter(AccessLevel.PRIVATE)
