@@ -50,7 +50,7 @@ public class SubjectListener implements Listener {
     private final ConcurrentMap<UUID, DatastoreSubject> subjectMap = new ConcurrentHashMap<>();
     private final OrbitProxyPlugin plugin;
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(final LoginEvent event) {
         if (event.isCancelled()) {
             return;
@@ -87,11 +87,10 @@ public class SubjectListener implements Listener {
         });
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPostLogin(PostLoginEvent event) {
-        ProxiedPlayer player = event.getPlayer();
-        UUID uniqueId = player.getUniqueId();
-        DatastoreSubject subject = subjectMap.remove(uniqueId);
+        final ProxiedPlayer player = event.getPlayer();
+        DatastoreSubject subject = subjectMap.remove(player.getUniqueId());
         if (subject == null) {
             player.disconnect(UNEXPECTED_ERROR);
             return;
@@ -103,6 +102,7 @@ public class SubjectListener implements Listener {
                 player.setPermission(permission, false);
             }
         }
+        plugin.getProxy().getPluginManager().callEvent(new OrbitPostLoginEvent(player));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
