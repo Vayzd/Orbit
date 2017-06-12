@@ -59,7 +59,7 @@ public class DatastoreSubject implements DatastoreEntry {
 
     public boolean hasPermission(@NonNull String permission) {
         checkNotNull(permission, "Permission to check for can't be null");
-        return matcher.hasPermission(permission);
+        return (group != null && group.hasPermission(permission)) || matcher.hasPermission(permission);
     }
 
     public Set<String> getCombinedPermissionSet() {
