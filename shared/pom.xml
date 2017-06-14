@@ -14,4 +14,27 @@
     <artifactId>orbit-shared</artifactId>
     <packaging>jar</packaging>
     <version>1.12-SNAPSHOT</version>
+
+    <repositories>
+        <!-- BungeeCord Repository -->
+        <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-chat</artifactId>
+            <scope>provided</scope>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.vayzd</groupId>
+            <artifactId>orbit-datastore</artifactId>
+            <scope>provided</scope>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
